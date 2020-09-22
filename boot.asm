@@ -58,7 +58,11 @@ main:
 	mov dl, [drivenumber]
 	or dl, 80h
 	int 13h
-	jmp 0:800h
+	call setGdt
+	mov eax, cr0
+	or al, 1
+	mov cr0, eax
+	jmp 08h:PModeMain
 
 do_e820:
 	mov di, 0x8000
@@ -143,6 +147,18 @@ check_a20__exit:
 	pop ds
 	ret
 
+setGdt:
+	xor eax, eax
+	mov ax, ds
+	shl eax, 4
+	add eax, GDT_table
+	mov [gdtr + 2], eax
+	mov eax, GDT_end
+	sub eax, GDT_table
+	mov [gdtr], ax
+	lgdt [gdtr]
+	ret
+
 drivenumber:
 		db 0
 diskpacket:
@@ -153,6 +169,18 @@ db_off:	dw 800h
 		dw 0
 d_lba:	dd 1
 		dd 0
+
+gdtr:		dw 0
+			dd 0
+align 16
+GDT_table:  dq 0
+			dq 00CF9A000000FFFFh ; CS for Ring 0
+			dq 00CF92000000FFFFh ; DS for Ring 0
+			dq 00CFFA000000FFFFh ; CS for Ring 3
+			dq 00CFF2000000FFFFh ; DS for Ring 3
+			dq 00C089009F000100h ; TSS
+GDT_end:	dd 0
+align 4
 		times 444-($-$$) db 0
 mbr:	dw 0
 		db 80h       ; Bootable
@@ -165,14 +193,7 @@ mbr:	dw 0
 		db 0x55
 		db 0xAA
 
-at800h:
-;	call print_hex
-	call setGdt
-	mov eax, cr0
-	or al, 1
-	mov cr0, eax
-	jmp 08h:PModeMain
-
+PModeMain:
 ;print_hex: ; stack
 ;	mov bp, sp
 ;	mov dx, [bp + 2]
@@ -199,44 +220,3 @@ at800h:
 ;.addnum:
 ;	add al, 0x30
 ;	ret
-
-setGdt:
-	xor eax, eax
-	mov ax, ds
-	shl eax, 4
-	add eax, GDT_table
-	mov [gdtr + 2], eax
-	mov eax, GDT_end
-	sub eax, GDT_table
-	mov [gdtr], ax
-	lgdt [gdtr]
-	ret
-
-gdtr:		dw 0
-			dd 0
-align 16
-GDT_table:  dq 0
-			dq 00CF9A000000FFFFh ; CS for Ring 0
-			dq 00CF92000000FFFFh ; DS for Ring 0
-			dq 00CFFA000000FFFFh ; CS for Ring 3
-			dq 00CFF2000000FFFFh ; DS for Ring 3
-			dq 00C089009F000100h ; TSS
-GDT_end:	dd 0
-align 4
-
-BITS 32
-PModeMain:
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
-	mov ebx, 0xb8000
-	mov al, '!'
-	mov ah, 0x0F
-	mov [ebx], ax
-.hang:
-	jmp .hang
-
-times 0x6600-($-$$) db 0xba
