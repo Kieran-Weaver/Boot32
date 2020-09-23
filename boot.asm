@@ -58,10 +58,24 @@ main:
 	mov dl, [drivenumber]
 	or dl, 80h
 	int 13h
+	clc
+.err:
+	int 12h
+	jc .err
+;	push bx
+	push ax
 	call setGdt
 	mov eax, cr0
 	or al, 1
 	mov cr0, eax
+	xor eax, eax
+	xor ebp, ebp
+	call flush_gdt
+	pop ax
+;	pop bx
+	pop bp
+	pop dx
+;	mov ss, dx
 	jmp 08h:PModeMain
 
 do_e820:
@@ -157,6 +171,13 @@ setGdt:
 	sub eax, GDT_table
 	mov [gdtr], ax
 	lgdt [gdtr]
+	ret
+
+flush_gdt:
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov ss, ax
 	ret
 
 drivenumber:
