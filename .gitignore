@@ -1,0 +1,6 @@
+*.d
+*.o
+*.obj
+*.elf
+*.bin
+*.img

@@ -79,7 +79,7 @@ main:
 	jmp 08h:PModeMain
 
 do_e820:
-	mov di, 0x8000
+	mov di, 0x7C00
 	xor ebx, ebx		; ebx must be 0 to start
 	xor bp, bp		; keep an entry count in bp
 	mov edx, 0x0534D4150	; Place "SMAP" into edx
@@ -202,7 +202,8 @@ GDT_table:  dq 0
 			dq 00C089009F000100h ; TSS
 GDT_end:	dd 0
 align 4
-		times 444-($-$$) db 0
+		times 440-($-$$) db 0
+		db 'bruh'
 mbr:	dw 0
 		db 80h       ; Bootable
 		db 0, 33h, 0 ; CHS After bootloader
