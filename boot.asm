@@ -201,7 +201,7 @@ GDT_table:  dq 0
 			dq 00CF92000000FFFFh ; DS for Ring 0
 			dq 00C089009F000100h ; TSS
 GDT_end:	dd 0
-align 4
+align 1
 		times 440-($-$$) db 0
 		db 'bruh'    ; Signature
 mbr:	dw 0

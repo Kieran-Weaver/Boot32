@@ -42,7 +42,7 @@ setSegments:
 .globl readSector
 readSector:
 	mov 4(%esp), %eax             // start sector
-	mov %eax, (diskpacket + 16)
+	mov %eax, (diskpacket + 8)
 	mov 8(%esp), %edx             // drive number
 	
 	push %esi
@@ -79,7 +79,7 @@ rsetsegs:
 	mov %ax, %gs
 	mov %ax, %ss
 	ret
-	
+
 .err:                             // Read disk sector
 	mov $diskpacket, %si
 	mov $0x42, %ah
@@ -98,7 +98,9 @@ rsetsegs:
 pmode:
 	mov (backupCR0), %eax
 	mov %eax, %cr0
+	mov %esp, %eax
 	mov (backupESP), %esp         // Load 32-bit stack
+	mov %eax, (backupESP)
 	
 	mov $diskdata, %esi
 	mov 20(%esp), %edi            // Buffer

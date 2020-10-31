@@ -22,7 +22,7 @@ stage2.bin: stage2/stage2.ld stage2/crt0.o $(STAGE2_OBJS)
 	$(CC) -Os -T stage2/stage2.ld $(STAGE2_OBJS) -o stage2.bin -nostdlib -ffreestanding
 
 hda.img: stage2.bin boot.bin
-	./dir2fat32/dir2fat32.sh hda.img $(MB) stage3/
+	./dir2fat32/dir2fat32.sh -f hda.img $(MB) stage3/
 	dd if=boot.bin of=hda.img bs=512 conv=notrunc
 	dd if=stage2.bin of=hda.img bs=512 seek=1 conv=notrunc
 

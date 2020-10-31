@@ -1,9 +1,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "e820.h"
+#include "crt0.h"
+#include "pff3a/source/pff.h"
 extern const uint64_t GDT[];
-void setGdt(const uint64_t* gdt, uint16_t size, uint16_t cs, uint16_t ds);
-void readSector(uint32_t sector, uint16_t drive, uint8_t* buffer, uint32_t bufsize);
 void kprint(uint8_t* in, uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
 		*(screen++) = in[i];
@@ -21,11 +21,11 @@ void hextostr(uint32_t in, uint8_t* out){
 
 void bmain(uint16_t e820, uint16_t dx){
 	setGdt(GDT, 0x40, 0x20, 0x28);
+	setDrive(dx);
 	uint8_t * screen = (uint8_t*)0xB8000;
 	kprint(" Base       | Length     | Type", screen, 32);
 	screen += 160;
 	uint8_t str[] = " 0x00000000 | 0x0009FC00 | 1";
-	uint32_t buf[128] = {};
 	return_t entries = validate((SMAP_entry_t*)0x7C00, e820);
 	for (uint16_t i = 0; i < entries.n; i++){
 		hextostr(entries.data->base, str + 3);
@@ -35,12 +35,31 @@ void bmain(uint16_t e820, uint16_t dx){
 		screen += 160;
 		(entries.data)++;
 	}
-	readSector(0x0, dx, (uint8_t*)buf, 512);
-	uint32_t* bptr = buf;
-	for (uint16_t i = 0; i < 4; i++){
-		hextostr(*(bptr++), str);
-		hextostr(*(bptr++), str + 12);
-		kprint(str, screen, 29);
+	FATFS fs;
+	FRESULT res;
+	
+	res = pf_mount(&fs);
+	if (res) {
+		hextostr(res, str + 3);
+		kprint(str, screen, 16);
 		screen += 160;
 	}
+	
+	res = pf_open("ATA.C");
+	if (res) {
+		hextostr(res, str + 3);
+		kprint(str, screen, 16);
+		screen += 160;
+	}
+	uint8_t filebuf[64];
+	UINT br;
+	res = pf_read(filebuf, 63, &br);
+	
+	if (res) {
+		hextostr(res, str + 3);
+		kprint(str, screen, 16);
+		screen += 160;
+	}
+	filebuf[63] = '\0';
+	kprint(filebuf, screen, 63);
 }
