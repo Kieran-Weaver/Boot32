@@ -1,0 +1,3 @@
+[submodule "dir2fat32"]
+	path = dir2fat32
+	url = https://github.com/Othernet-Project/dir2fat32.git

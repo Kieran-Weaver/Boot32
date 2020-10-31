@@ -11,8 +11,10 @@
 ;   DX register (drive number)
 
 ; CHS and LBA sizes of the first partition
-%define MBR_CHS 0, 0, 0
-%define MBR_LBA 0
+%define MBR_CHS 0, 33h, 0
+%ifndef MBR_LBA
+%define MBR_LBA 0h
+%endif
 BITS 16
 [ORG 0x0600]
 main:
@@ -197,48 +199,20 @@ align 16
 GDT_table:  dq 0
 			dq 00CF9A000000FFFFh ; CS for Ring 0
 			dq 00CF92000000FFFFh ; DS for Ring 0
-			dq 00CFFA000000FFFFh ; CS for Ring 3
-			dq 00CFF2000000FFFFh ; DS for Ring 3
 			dq 00C089009F000100h ; TSS
 GDT_end:	dd 0
 align 4
 		times 440-($-$$) db 0
-		db 'bruh'
+		db 'bruh'    ; Signature
 mbr:	dw 0
 		db 80h       ; Bootable
 		db 0, 33h, 0 ; CHS After bootloader
 		db 83h       ; Type Linux
 		db MBR_CHS   ; Last sector of partition
-		dd 32h       ; After bootloader
+		dd 4000h     ; Stage 3 start
 		dd MBR_LBA   ; LBA size
 		times 510-($-$$) db 0
 		db 0x55
 		db 0xAA
 
 PModeMain:
-;print_hex: ; stack
-;	mov bp, sp
-;	mov dx, [bp + 2]
-;	mov cx, 4
-;.L1:
-;	mov al, dl
-;	and al, 0x0F
-;	call get_hex
-;	shr dx, 4
-;	call print_char
-;	loop .L1
-;	ret
-;
-;print_char:
-;	mov ah, 0x0E
-;	mov bh, 0
-;	int 0x10
-;	ret
-;
-;get_hex:
-;	cmp al, 10
-;	jl .addnum
-;	add al, 0x7
-;.addnum:
-;	add al, 0x30
-;	ret

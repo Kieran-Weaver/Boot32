@@ -2,6 +2,8 @@ CC=i686-elf-gcc
 ASM=nasm
 STAGE2_SRCS=$(shell find stage2/ -path "*.c")
 STAGE2_OBJS=$(patsubst %.cpp, %.o, $(STAGE2_SRCS))
+MB=128
+STAGE3_SECTORS=$(shell echo "$(MB) * 2048 - 51" | bc)
 all: boot.bin stage2.bin
 
 %.bin: %.asm
@@ -14,14 +16,15 @@ all: boot.bin stage2.bin
 	$(CC) $^ -c -o $@ -ffreestanding
 
 boot.bin: boot.asm
-	nasm $^ -f bin -o $@
+	nasm $^ -D MBR_LBA=$(STAGE3_SECTORS) -f bin -o $@
 
 stage2.bin: stage2/stage2.ld stage2/crt0.o $(STAGE2_OBJS)
 	$(CC) -Os -T stage2/stage2.ld $(STAGE2_OBJS) -o stage2.bin -nostdlib -ffreestanding
 
 hda.img: stage2.bin boot.bin
-	dd if=boot.bin of=hda.img bs=512
-	dd if=stage2.bin of=hda.img bs=512 oflag=append conv=notrunc
+	./dir2fat32/dir2fat32.sh hda.img $(MB) stage3/
+	dd if=boot.bin of=hda.img bs=512 conv=notrunc
+	dd if=stage2.bin of=hda.img bs=512 seek=1 conv=notrunc
 
 run: hda.img
 	qemu-system-i386 -hda hda.img
