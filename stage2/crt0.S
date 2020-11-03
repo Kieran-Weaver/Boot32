@@ -7,6 +7,7 @@ _bstart:
 	pushl %edx
 	pushl %ebp
 	call bmain
+	call *%eax
 .hang:
 	jmp .hang
 

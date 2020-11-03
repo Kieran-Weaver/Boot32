@@ -2,8 +2,8 @@ CC=i686-elf-gcc
 ASM=nasm
 STAGE2_SRCS=$(shell find stage2/ -path "*.c")
 STAGE3_SRCS=$(shell find stage3/ -path "*.c")
-STAGE2_OBJS=$(patsubst %.cpp, %.o, $(STAGE2_SRCS))
-STAGE3_OBJS=$(patsubst %.cpp, %.o, $(STAGE3_SRCS))
+STAGE2_OBJS=$(patsubst %.c, %.o, $(STAGE2_SRCS))
+STAGE3_OBJS=$(patsubst %.c, %.o, $(STAGE3_SRCS))
 MB=128
 STAGE3_SECTORS=$(shell echo "$(MB) * 2048 - 51" | bc)
 all: hda.img
