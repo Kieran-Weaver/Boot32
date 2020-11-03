@@ -1,31 +1,19 @@
 #include <stdint.h>
 #include <stddef.h>
+#include "util.h"
 #include "e820.h"
 #include "crt0.h"
 #include "pff3a/source/pff.h"
-uint32_t page_directory[1024] __attribute__((aligned(4096)));
-uint32_t page_table[1024] __attribute__((aligned(4096)));
-
+static uint32_t page_directory[1024] __attribute__((aligned(4096)));
+static uint32_t page_table[1024] __attribute__((aligned(4096)));
+static volatile uint8_t * screen;
 extern const uint64_t GDT[];
-void kprint(uint8_t* in, volatile uint8_t* screen, uint16_t n){
-	for (uint16_t i = 0; i < n; i++){
-		*(screen++) = in[i];
-		*(screen++) = 0x0F;
-	}
-}
-
-void hextostr(uint32_t in, uint8_t* out){
-	uint8_t *bytes = "0123456789ABCDEF";
-	for (uint8_t i = 0; i < 8; i++){
-		out[7-i] = bytes[in & 0x0F];
-		in >>= 4;
-	}
-}
 
 uint32_t bmain(uint16_t e820, uint16_t dx){
 	setGdt(GDT, 0x40, 0x20, 0x28);
 	setDrive(dx);
-	volatile uint8_t * screen = (uint8_t*)0xB8000;
+	screen = (volatile uint8_t*)0xB8000;
+
 	kprint(" Base       | Length     | Type", screen, 32);
 	screen += 160;
 	uint8_t str[] = " 0x00000000 | 0x0009FC00 | 1";
@@ -42,11 +30,7 @@ uint32_t bmain(uint16_t e820, uint16_t dx){
 	FRESULT res;
 	
 	res = pf_mount(&fs);
-	if (res) {
-		hextostr(res, str + 3);
-		kprint(str, screen, 16);
-		screen += 160;
-	}
+	assert(res == 0);
 		
 	for (uint16_t i = 0; i < 1024; i++) {
 		page_directory[i] = 0x00000002;
@@ -80,12 +64,8 @@ uint32_t bmain(uint16_t e820, uint16_t dx){
 	kprint("Hello Paging World!", screen, 19);
 	
 	res = pf_open("KERNEL.BIN");
-	if (res) {
-		hextostr(res, str + 3);
-		kprint(str, screen, 16);
-		screen += 160;
-	}
-
+	assert(res == 0);
+	
 	UINT bytesread = 0;
 	int pt_index = 0;
 	

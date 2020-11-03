@@ -8,5 +8,6 @@ void setDrive(uint16_t drive);
 void readSector(uint32_t sector, uint16_t drive, uint8_t* buffer, uint32_t bufsize);
 void loadPageDirectory(uint32_t*);
 void enablePaging();
+void bhang();
 
 #endif

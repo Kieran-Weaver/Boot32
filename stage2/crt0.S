@@ -8,8 +8,11 @@ _bstart:
 	pushl %ebp
 	call bmain
 	call *%eax
-.hang:
-	jmp .hang
+	jmp bhang
+
+.globl bhang
+bhang:
+	jmp bhang
 
 .globl setGdt
 setGdt:
