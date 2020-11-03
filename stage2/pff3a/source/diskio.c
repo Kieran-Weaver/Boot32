@@ -10,9 +10,6 @@ static uint16_t drive = 0xFFFF;
 static DWORD current_sector = 0xFFFFFFFF;
 static uint8_t buf[514] = {};
 
-void kprint(uint8_t* in, uint8_t* screen, uint16_t n);
-void hextostr(uint32_t in, uint8_t* out);
-
 void setDrive(uint16_t drv){
 	drive = drv;
 }
@@ -45,27 +42,17 @@ DRESULT disk_readp (
 	UINT count		/* Byte count (bit15:destination) */
 )
 {
-	uint8_t strbuf[64];
 	DRESULT res = 0;
 	UINT i;
-	uint8_t* screen = (uint8_t*)0xB8000;
-	hextostr(offset, strbuf);
-	kprint(strbuf, screen, 16);
-	screen += 160;
-	hextostr(offset + count, strbuf);
-	kprint(strbuf, screen, 16);
-	screen += 160;
-	hextostr(sector, strbuf);
-	kprint(strbuf, screen, 16);
 	
 	if ((buff == NULL) || (offset >= 512) || ((offset + count) > 512)){
 		res = RES_PARERR;
 	} else {
 	
-//		if (current_sector != sector) {
+		if (current_sector != sector) {
 			readSector(sector, drive, buf, 512);
 			current_sector = sector;
-//		}
+		}
 	
 		const uint8_t* tmpbuf = buf;
 		tmpbuf = tmpbuf + offset;
@@ -77,9 +64,6 @@ DRESULT disk_readp (
 	}
 	// Put your code here
 
-	screen += 160;
-	hextostr((uint32_t)buf, strbuf);
-	kprint(strbuf, screen, 16);
 	return res;
 }
 
