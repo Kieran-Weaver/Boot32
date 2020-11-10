@@ -56,13 +56,13 @@ make run
 
 ### TODO:
 - Add simple kernel
--- Use standard x86 hardware:
---  Enable FPU
--- Process APM, ACPI, SMBios
--- Handle Interrupts: IDT, PIC, APIC, IOAPIC
--- Handle Timers & Clocks: PIT, RTC, HPET
--- Make the kernel useful:
--- Create VM subsystem
--- Create STDIO driver
--- Create ATA driver
--- Create FS / VFS subsystem
+  - Use standard x86 hardware:
+    - Enable FPU
+    - Process APM, ACPI, SMBios
+    - Handle Interrupts: IDT, PIC, APIC, IOAPIC
+    - Handle Timers & Clocks: PIT, RTC, HPET
+  - Make the kernel useful:
+    - Create VM subsystem
+    - Create STDIO driver
+    - Create ATA driver
+    - Create FS / VFS subsystem
