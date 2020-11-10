@@ -61,7 +61,7 @@ int kputs(const uint8_t* in, volatile uint8_t* screen, uint16_t pos) {
 		pos = (pos - offset) + 160;
 	}
 	kprint(in, screen + pos, len);
-	return pos + len;
+	return pos + (len * 2);
 }
 
 void __assert_fail(const char * x, const char * file, int line, const char * func) {
@@ -86,4 +86,13 @@ uint32_t min(uint32_t a, uint32_t b){
 
 uint32_t max(uint32_t a, uint32_t b){
 	return (a > b) ? a : b;
+}
+
+void* memset(void* s, int c, size_t n) {
+	uint8_t* dst = s;
+	uint32_t i;
+	for (i = 0; i < n; i++) {
+		dst[i] = c;
+	}
+	return s;
 }

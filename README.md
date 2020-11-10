@@ -55,8 +55,6 @@ make run
 ```
 
 ### TODO:
-- Add Makefile dependency tracking
-- Add ELF Loading
 - Add simple kernel
 -- Use standard x86 hardware:
 --  Enable FPU

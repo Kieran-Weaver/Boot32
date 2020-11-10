@@ -13,5 +13,6 @@ void kprint(const uint8_t* in, volatile uint8_t* screen, uint16_t n);
 int  kputs(const uint8_t* in, volatile uint8_t* screen, uint16_t pos);
 int  strlen(const uint8_t* str);
 int  memcmp(const void* s1, const void* s2, size_t n);
+void* memset(void* s, int c, size_t n);
 
 #endif

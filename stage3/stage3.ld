@@ -1,8 +1,8 @@
 ENTRY(_kstart)
-OUTPUT_FORMAT(binary)
+OUTPUT_FORMAT(elf32-i386)
 SEARCH_DIR(stage3)
 STARTUP(crt0.o)
-OUTPUT(kernel.bin)
+OUTPUT(kernel.elf)
 MEMORY{
 	RAM (wx) : org = 0xFFC00000, len = 0x400000
 }

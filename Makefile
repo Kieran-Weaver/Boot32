@@ -26,10 +26,10 @@ boot.bin: boot.asm
 stage2.bin: stage2/stage2.ld stage2/crt0.o $(STAGE2_OBJS)
 	$(CC) -Os -T stage2/stage2.ld $(STAGE2_OBJS) -o stage2.bin -nostdlib -ffreestanding
 
-stage3/kernel.bin: stage3/stage3.ld stage3/crt0.o $(STAGE3_OBJS)
-	$(CC) -Os -T stage3/stage3.ld $(STAGE3_OBJS) -o stage3/kernel.bin -nostdlib -ffreestanding
+stage3/kernel.elf: stage3/stage3.ld stage3/crt0.o $(STAGE3_OBJS)
+	$(CC) -Os -T stage3/stage3.ld $(STAGE3_OBJS) -o stage3/kernel.elf -nostdlib -ffreestanding
 
-hda.img: stage3/kernel.bin stage2.bin boot.bin
+hda.img: stage3/kernel.elf stage2.bin boot.bin
 	./dir2fat32/dir2fat32.sh -f hda.img $(MB) stage3/
 	dd if=boot.bin of=hda.img bs=512 conv=notrunc
 	dd if=stage2.bin of=hda.img bs=512 seek=1 conv=notrunc
@@ -38,7 +38,7 @@ run: hda.img
 	qemu-system-i386 -hda hda.img
 
 clean:
-	rm -fr boot.bin stage2.bin stage3/kernel.bin hda.img stage2/*.o stage3/*.o stage2/*.d stage3/*.d
+	rm -fr boot.bin stage2.bin stage3/kernel.elf hda.img $(STAGE2_OBJS) $(STAGE3_OBJS) $(STAGE2_DEPS) $(STAGE3_DEPS)
 
 -include $(STAGE2_DEPS)
 -include $(STAGE3_DEPS)
