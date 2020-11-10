@@ -79,3 +79,11 @@ void __assert_fail(const char * x, const char * file, int line, const char * fun
 	pos = kputs(func, screen, pos);
 	bhang();
 }
+
+uint32_t min(uint32_t a, uint32_t b){
+	return (a < b) ? a : b;
+}
+
+uint32_t max(uint32_t a, uint32_t b){
+	return (a > b) ? a : b;
+}

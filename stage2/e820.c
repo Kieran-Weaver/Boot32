@@ -1,7 +1,5 @@
 #include "e820.h"
-uint32_t max(uint32_t a, uint32_t b){
-	return (a > b) ? a : b;
-}
+#include "util.h"
 uint16_t compressE820(SMAP_entry_t* in, SMAP32_t* out, uint16_t n){
 	uint16_t j = 0;
 	for (uint16_t i = 0; i < n; i++){

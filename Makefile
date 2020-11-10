@@ -1,9 +1,12 @@
 CC=i686-elf-gcc
+CPPFLAGS= -MT $@ -MMD -MP -MF $*.d
 ASM=nasm
 STAGE2_SRCS=$(shell find stage2/ -path "*.c")
 STAGE3_SRCS=$(shell find stage3/ -path "*.c")
 STAGE2_OBJS=$(patsubst %.c, %.o, $(STAGE2_SRCS))
+STAGE2_DEPS=$(patsubst %.c, %.d, $(STAGE2_SRCS))
 STAGE3_OBJS=$(patsubst %.c, %.o, $(STAGE3_SRCS))
+STAGE3_DEPS=$(patsubst %.c, %.d, $(STAGE3_SRCS))
 MB=128
 STAGE3_SECTORS=$(shell echo "$(MB) * 2048 - 51" | bc)
 all: hda.img
@@ -15,7 +18,7 @@ all: hda.img
 	$(CC) $^ -c -o $@
 
 %.o: %.c
-	$(CC) $^ -c -o $@ -ffreestanding
+	$(CC) $(CPPFLAGS) $< -c -o $@ -ffreestanding
 
 boot.bin: boot.asm
 	nasm $^ -D MBR_LBA=$(STAGE3_SECTORS) -f bin -o $@
@@ -35,4 +38,7 @@ run: hda.img
 	qemu-system-i386 -hda hda.img
 
 clean:
-	rm -fr boot.bin stage2.bin stage3/kernel.bin hda.img stage2/*.o stage3/*.o
+	rm -fr boot.bin stage2.bin stage3/kernel.bin hda.img stage2/*.o stage3/*.o stage2/*.d stage3/*.d
+
+-include $(STAGE2_DEPS)
+-include $(STAGE3_DEPS)

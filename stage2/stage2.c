@@ -60,6 +60,9 @@ uint32_t bmain(uint16_t e820, uint16_t dx){
 		entries_index++;
 	}
 	
+	loadPageDirectory(page_directory);
+	enablePaging();
+
 	screen += 160;
 	kprint("Hello Paging World!", screen, 19);
 	
@@ -67,11 +70,11 @@ uint32_t bmain(uint16_t e820, uint16_t dx){
 	assert(res == 0);
 	
 	UINT bytesread = 0;
-	int pt_index = 0;
-	
+	int pt_index = 0;		
+
 	do {
-		void* paddr = (void*)(page_table[pt_index] & 0xFFFFF000);
-		res = pf_read(paddr, 4096, &bytesread);
+		void* vaddr = (void*)(0xFFC00000 + (4096 * pt_index));
+		res = pf_read(vaddr, 4096, &bytesread);
 		if (res) {
 			hextostr(res, str + 3);
 			kprint(str, screen, 16);
@@ -79,9 +82,6 @@ uint32_t bmain(uint16_t e820, uint16_t dx){
 		}
 		pt_index++;
 	} while (bytesread == 4096);
-	
-	loadPageDirectory(page_directory);
-	enablePaging();
 
 	return 0xFFC00000;
 }
