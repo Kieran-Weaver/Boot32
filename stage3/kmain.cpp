@@ -18,14 +18,14 @@ void clear(volatile uint8_t* screen) {
 	}
 }
 
-void kmain() {
+extern "C" void kmain() {
 	volatile uint8_t* screen = (uint8_t*)0xB8000;
 	clear(screen);
-	const uint8_t* str1 = "Roses are #ff0000";
-	const uint8_t* str2 = "Violets are #0000ff";
-	const uint8_t* str3 = "All of my base";
-	const uint8_t* str4 = "Are belong to you";
-	const uint8_t* str5 = "Operating system not found";
+	const uint8_t* str1 = reinterpret_cast<const uint8_t*>("Roses are #ff0000");
+	const uint8_t* str2 = reinterpret_cast<const uint8_t*>("Violets are #0000ff");
+	const uint8_t* str3 = reinterpret_cast<const uint8_t*>("All of my base");
+	const uint8_t* str4 = reinterpret_cast<const uint8_t*>("Are belong to you");
+	const uint8_t* str5 = reinterpret_cast<const uint8_t*>("Operating system not found");
 	kprint(str1, screen, strlen(str1));
 	kprint(str2, screen + 160, strlen(str2));
 	kprint(str3, screen + 320, strlen(str3));

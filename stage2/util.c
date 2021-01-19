@@ -38,16 +38,12 @@ int strlen(const uint8_t* str) {
 }
 
 int memcmp(const void* _s1, const void* _s2, size_t n) {
-	const uint8_t* s1 = _s1;
-	const uint8_t* s2 = _s2;
-	int i;
-	
-	for (i = 0; i < n; i++) {
-		if (*s1 == *s2) {
-			s1++;
-			s2++;
-		} else {
-			return (*s1 - *s2);
+	const uint8_t* u1 = (const uint8_t*)_s1;
+	const uint8_t* u2 = (const uint8_t*)_s2;
+
+	for (; n > 0; n--) {
+		if (*(u1++) != *(u2++)) {
+			return *(u1 - 1) - *(u2 - 1);
 		}
 	}
 	
@@ -90,9 +86,8 @@ uint32_t max(uint32_t a, uint32_t b){
 
 void* memset(void* s, int c, size_t n) {
 	uint8_t* dst = s;
-	uint32_t i;
-	for (i = 0; i < n; i++) {
-		dst[i] = c;
+	for (; n > 0; n--) {
+		*(dst++) = c;
 	}
 	return s;
 }

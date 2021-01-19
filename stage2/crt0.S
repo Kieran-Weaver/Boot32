@@ -4,6 +4,13 @@ _bstart:
 	shl $10, %eax
 	mov %esp, (backupESP)
 	mov %eax, %esp
+	mov %cr0, %eax
+	and $0xF9, %al
+	mov %eax, %cr0
+	fninit
+	fnstsw (FPUTest)
+	cmpw $0, (FPUTest)
+	jne bhang
 	pushl %edx
 	pushl %ebp
 	call bmain
@@ -164,6 +171,9 @@ diskpacket:
 	.word 0  // Buffer segment, always 0 since code is in segment 0000
 	.int  0  // Lower 32-bits LBA
 	.int  0  // Upper 32-bits LBA
+
+FPUTest:
+	.word 0x55AA
 
 .align 16
 diskdata:
