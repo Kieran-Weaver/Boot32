@@ -42,7 +42,7 @@ make run
 - Locates the boot drive
 - Identity maps the first 4M of the physical address space
 - Maps the first 4M of free RAM above 4M to the last 4M of the virtual address space
-- Loads the kernel from the first FAT32 partition on the boot drive to 0xFFC00000
+- Loads the kernel from the first FAT32 partition on the boot drive to `p_vaddr` in the ELF header
 
 ### Stage 2 Memory Layout:
 ```

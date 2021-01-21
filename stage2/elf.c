@@ -1,5 +1,6 @@
 #include "elf.h"
 #include "util.h"
+#include "pt.h"
 #include "pff3a/source/pff.h"
 
 bool elf_is_elf(struct Elf32_Ehdr* hdr) {
@@ -66,6 +67,9 @@ void* elf_load_file(const char* filename, void* buf, int bufsiz) {
 		
 		if (phdr->p_type == PT_LOAD) {
 			pf_lseek(phdr->p_offset);
+			for (bytesread = 0; bytesread < phdr->p_filesz; bytesread += 0x1000) {
+				pt_map(phdr->p_vaddr + bytesread);
+			}
 			pf_read((void*)(phdr->p_vaddr), phdr->p_filesz, &bytesread);
 			memset((void*)(phdr->p_vaddr + bytesread), 0, phdr->p_memsz - bytesread);
 		}

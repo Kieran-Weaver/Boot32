@@ -4,12 +4,12 @@ SEARCH_DIR(stage3)
 STARTUP(crt0.o)
 OUTPUT(kernel.elf)
 MEMORY{
-	RAM (wx) : org = 0xFFC00000, len = 0x400000
+	RAM (wx) : org = 0xFF000000, len = 0x400000
 }
 SECTIONS{
 	_KERNEL_START_ = .;
 
-	.text.start (0xFFC00000):{
+	.text.start (0xFF000000):{
 		crt0.o(.text)
 	} > RAM
 
