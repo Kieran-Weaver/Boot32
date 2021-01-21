@@ -38,12 +38,16 @@ build/%.o: %.cpp
 boot.bin: boot.asm
 	nasm $^ -D MBR_LBA=$(STAGE3_SECTORS) -f bin -o $@
 
-stage2.bin: stage2/stage2.ld stage2/crt0.o $(STAGE2_OBJS)
+stage2.bin: stage2/stage2.ld build/stage2/crt0.o $(STAGE2_OBJS)
+	cp build/stage2/crt0.o stage2/crt0.o
 	$(CC) -Os -T stage2/stage2.ld $(STAGE2_OBJS) -o stage2.bin -nostdlib -ffreestanding
+	rm -f stage2/crt0.o
 
-root/kernel.elf: stage3/stage3.ld stage3/crt0.o $(STAGE3_OBJS)
+root/kernel.elf: stage3/stage3.ld build/stage3/crt0.o $(STAGE3_OBJS)
 	mkdir -p root
+	cp build/stage3/crt0.o stage3/crt0.o
 	$(CC) -Os -T stage3/stage3.ld $(STAGE3_OBJS) -o root/kernel.elf -nostdlib -ffreestanding
+	rm -f stage3/crt0.o
 
 hda.img: root/kernel.elf stage2.bin boot.bin
 	./dir2fat32/dir2fat32.sh -f hda.img $(MB) root/

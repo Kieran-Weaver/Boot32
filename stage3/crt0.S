@@ -1,6 +1,6 @@
 .section .text
 .global _kstart
 _kstart:
-	call kmain
+	jmp kmain
 .hang:
 	jmp .hang
