@@ -11,14 +11,12 @@ SECTIONS{
 		crt0.o(.text)
 	} > RAM
 	.text : ALIGN(0x100){
-	_TEXT_START_ = .;
 		*(.text)
-	_TEXT_END_ = .;
 	} > RAM
 	.data : ALIGN(0x100){
 		*(.data)
 	} > RAM
 	.bss : ALIGN(0x100){
-		*(.data)
+		*(.bss)
 	} > RAM
 }

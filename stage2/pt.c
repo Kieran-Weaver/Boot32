@@ -7,19 +7,25 @@ static SMAP32_t* e820;
 static size_t    e820_size;
 static uint16_t entries_index = 0;
 static uint16_t page_table_index = 0;
-static uint32_t entry_addr = 0x400000;
+static uint32_t entry_addr = 0;
 
 static inline void invlpg(void* m) {
     asm volatile ( "invlpg (%0)" : : "b"(m) : "memory" );
 }
 
 static void* palloc(void) {
-	void* paddr = (void*)entry_addr;
+	void* paddr = (void*)(entry_addr - 0x1000);
 	
-	entry_addr += 0x1000;
-	if (entry_addr >= (e820[entries_index].base + e820[entries_index].length)) {
-		entries_index++;
-		entry_addr = (e820[entries_index].base + 0x0FFF) & 0xFFFFF000;
+	entry_addr -= 0x1000;
+	if (e820[entries_index].length >= 0x1000) {
+		e820[entries_index].length -= 0x1000;
+	} else {
+		e820[entries_index].length = 0;
+	}
+	
+	if (entry_addr <= e820[entries_index].base) {
+		entries_index--;
+		entry_addr = (e820[entries_index].base + e820[entries_index].length + 0x0FFF) & 0xFFFFF000;
 	}
 	
 	return paddr;
@@ -37,13 +43,11 @@ void pt_init(SMAP32_t* _e820, size_t _e820_size) {
 	page_directory[0] = 0x0000008B; // Identity mapped first 4 MB, no cache
 	page_directory[1023] = 0x00000003 | (uint32_t)(page_directory); // Page Directory
 	
-	while ((e820[entries_index].base + e820[entries_index].length) <= 0x400000) {
+	while (e820[entries_index + 1].type == 1) {
 		entries_index++;
 	}
 	
-	if (e820[entries_index].base > 0x400000) {
-		entry_addr = (e820[entries_index].base + 0x0FFF) & 0xFFFFF000;
-	}
+	entry_addr = (e820[entries_index].base + e820[entries_index].length + 0x0FFF) & 0xFFFFF000;
 
 	loadPageDirectory(page_directory);
 	enablePaging();

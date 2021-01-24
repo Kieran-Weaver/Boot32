@@ -20,6 +20,20 @@ _bstart:
 bhang:
 	jmp bhang
 
+.globl enter
+enter:
+	movl 4(%esp),  %eax // entry
+	movl 8(%esp),  %ebx // stack
+	movl 12(%esp), %ecx // e820
+	movl 16(%esp), %edx // e820_size
+	subl $8, %ebx
+	movl %ebx, %esp
+
+	pushl %edx
+	pushl %ecx
+	call *%eax
+	jmp bhang
+
 .globl setGdt
 setGdt:
 	mov   4(%esp), %eax

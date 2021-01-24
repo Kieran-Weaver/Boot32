@@ -6,8 +6,8 @@
 #include "elf.h"
 #include "pt.h"
 #include "pff3a/source/pff.h"
+#define NEW_STACK 0xFFC00000
 extern const uint64_t GDT[];
-typedef void (*kmain)(SMAP32_t*, size_t);
 
 void bmain(uint16_t e820size, uint16_t dx){
 	struct Elf_Headers hdrs;
@@ -27,5 +27,6 @@ void bmain(uint16_t e820size, uint16_t dx){
 	pt_init(e820entries, e820size);
 	entry = (kmain)elf_load_file("KERNEL.ELF", &hdrs, sizeof(hdrs));
 	assert(entry != NULL);
-	entry(e820entries, e820size);
+	pt_map(NEW_STACK - 0x1000);
+	enter(entry, NEW_STACK, e820entries, e820size);
 }
