@@ -56,6 +56,25 @@ void* elf_load_file(const char* filename, void* buf, int bufsiz) {
 		return NULL;
 	}
 	
+	for (i = 0; i < hdr->e_shnum; i++) {
+		if (pf_lseek(hdr->e_shoff + (i * hdr->e_shentsize))) {
+			return NULL;
+		} else if (pf_read(shdr, sizeof(struct Elf32_Shdr), &bytesread)) {
+			return NULL;
+		} else if (bytesread != sizeof(struct Elf32_Shdr)) {
+			return NULL;
+		}
+		
+		if (shdr->sh_type == SHT_NOBITS) {
+			if (!shdr->sh_size) continue;
+			if (shdr->sh_flags & SHF_ALLOC) {
+				for (bytesread = 0; bytesread < shdr->sh_size; bytesread += 0x1000) {
+					pt_map(shdr->sh_addr + bytesread);
+				}
+			}
+		}
+	}
+	
 	for (i = 0; i < hdr->e_phnum; i++) {
 		if (pf_lseek(hdr->e_phoff + (i * hdr->e_phentsize))) {
 			return NULL;

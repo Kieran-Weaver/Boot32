@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "e820.h"
 #include "util.h"
+#include "pagetable.h"
+#include "pmm.h"
 
 void kprint(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
@@ -27,6 +29,9 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	volatile uint8_t* screen = (uint8_t*)0xB8000;
 	const uint8_t* header = reinterpret_cast<const uint8_t*>(" Base       | Length     | Type");
 	uint8_t str[] = " 0x00000000 | 0x0009FC00 | 1";
+	PageTable pt((vaddr_t)0xFFFFF000);
+	pt.activate();
+	pmm_init(e820, e820_size);
 
 	clear(screen);
 	kprint(header, screen, strlen(header));

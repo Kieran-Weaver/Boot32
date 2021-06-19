@@ -5,6 +5,7 @@
 const static uint32_t* pd  = reinterpret_cast<uint32_t*>(0xFFFFF000);
 
 struct ptinfo {
+	uint16_t free;
 	uint16_t largest;
 	uint16_t lstart;
 	uint16_t start;
@@ -40,7 +41,6 @@ static void set_ptinfo(uint16_t i) {
 			} else {
 				if (curr > ptmeta[i].largest) {
 					ptmeta[i].largest = curr;
-					ptmeta[i].lstart = counter - curr;
 				}
 				curr = 0;
 			}
@@ -71,17 +71,19 @@ paddr_t pt_map(paddr_t paddr, vaddr_t vaddr, uint32_t flags) {
 	uint32_t  pdi = (reinterpret_cast<uint32_t>(vaddr) >> 22);
 	uint32_t  pti = (reinterpret_cast<uint32_t>(vaddr) >> 12) & 0x3FF;	
 	uint32_t* pagetable = ((uint32_t*)0xFFC00000) + (0x400 * pdi);
+	paddr_t tmp;
 
 	vaddr = reinterpret_cast<vaddr_t>(reinterpret_cast<uint32_t>(vaddr) & 0xFFFFF000);
 	
 	if ((pd[pdi] & PRESENT) == 0) { // Not present
-		return false;
+		return 0xFFFFFFFF;
 	}
-	
+
+	tmp = pagetable[pti];
 	pagetable[pti] = paddr | (flags & 0xFFF) | 0x01;
 	invlpg(reinterpret_cast<void*>(vaddr));
 	
-	return true;
+	return tmp;
 }
 
 uint32_t pt_unmap(vaddr_t vaddr) {
@@ -110,24 +112,28 @@ vaddr_t valloc(uint32_t pages) {
 	uint16_t pdi = 0;
 	uint16_t pti = 0;
 	uint32_t vaddr = 0;
+	uint16_t i = 0;
+	bool found = false;
 
 	// Check every page except zero page
-	for (pdi = 1; pdi < 1024; i++) {
+	for (i = 1; i < 1024; i++) {
 		if (pages <= (ptmeta[i-1].end + ptmeta[i].start)) {
 			pdi = i - 1;
 			pti = 1024 - ptmeta[i-1].end;
+			found = true;
 			break;
 		} else if (pages <= ptmeta[i].largest) {
 			pdi = i;
 			pti = ptmeta[i].lstart;
+			found = true;
 			break;
 		}
 	}
 	
 	// Allocate zero page
-	if ((pdi == 0) && (start == 0)) {
-		start = ptmeta[0].lstart;	
-		if ((pages > ptmeta[0].start) && (pages > ptmeta[i].largest)) {
+	if (!found) {
+		pti = ptmeta[0].lstart;	
+		if ((pages > ptmeta[0].start) && (pages > ptmeta[0].largest)) {
 			return reinterpret_cast<vaddr_t>(-1);
 		}
 	}
@@ -136,13 +142,13 @@ vaddr_t valloc(uint32_t pages) {
 	
 	// Write present to page table
 	if (pages == 1) {
-		pt_map(0, (pdi << 22) + (pti << 12), PRESENT);
+		pt_map(0, (vaddr_t)((pdi << 22) + (pti << 12)), PRESENT);
 	} else {
-		pt_map(0, (pdi << 22) + (pti << 12), PRESENT | RANGE);
+		pt_map(0, (vaddr_t)((pdi << 22) + (pti << 12)), PRESENT | RANGE);
 		pages--;
 		pti++;
 		for (; pages > 0; pages--) {
-			pt_map(0, (pdi << 22) + (pti << 12), PRESENT);
+			pt_map(0, (vaddr_t)((pdi << 22) + (pti << 12)), PRESENT);
 			pti++;
 			if (pti == 1024) {
 				set_ptinfo(pdi);
@@ -150,13 +156,13 @@ vaddr_t valloc(uint32_t pages) {
 				pti = 0;
 			}
 		}
-		pt_map(0, (pdi << 22) + (pti << 12), PRESENT | RANGE);
+		pt_map(0, (vaddr_t)((pdi << 22) + (pti << 12)), PRESENT | RANGE);
 		pti++;
 	}
 	
 	return reinterpret_cast<vaddr_t>(vaddr);
 }
 
-uint32_t vfree(vaddr_t vaddr) {
+void vfree(vaddr_t vaddr) {
 	// TODO: Implement
 }

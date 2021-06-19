@@ -12,7 +12,7 @@ typedef uint32_t  paddr_t;
 
 enum PT {          // Set           / Unset
 	PRESENT = 1,   // Present       / not present
-	RW      = 2,   // Read          / Write
+	RW      = 2,   // Read+Write    / Read only
 	USER    = 4,   // User          / Supervisor
 	WTCACHE = 8,   // Write-through / Write-back
 	CDIS    = 16,  // Cache disable / Cache enable
@@ -32,9 +32,9 @@ void     vinit();
 // Allocate virtual pages
 vaddr_t  valloc(uint32_t pages);
 // Free virtual pages
-uint32_t vfree(vaddr_t vaddr);
+void vfree(vaddr_t vaddr);
 // Map a single virtual page
-bool     pt_map(paddr_t paddr, vaddr_t vaddr, uint32_t flags);
+paddr_t  pt_map(paddr_t paddr, vaddr_t vaddr, uint32_t flags);
 // Unmap a single virtual page
 uint32_t pt_unmap(vaddr_t vaddr);
 
