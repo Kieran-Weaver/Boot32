@@ -7,8 +7,10 @@ MEMORY{
 	RAM (wx) : org = 0xFF000000, len = 0x400000
 }
 SECTIONS{
+	BOOT_BEGIN = 0x600;
+	
 	_KERNEL_START_ = .;
-
+	
 	.text.start (0xFF000000):{
 		crt0.o(.text)
 	} > RAM
@@ -26,9 +28,7 @@ SECTIONS{
 	} > RAM
 
 	.bss : ALIGN(0x1000){
-	_BSS_START_ = .;
-		*(.data)
-	_BSS_END_ = .;
+		*(.bss)
 	} > RAM
 
 	_KERNEL_END_ = .;
