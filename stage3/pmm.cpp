@@ -14,7 +14,7 @@ void pmm_init(SMAP32_t* e820, size_t e820_size) {
 	pcount = 0;
 	pidx = 0;
 	
-	for (uint16_t idx = 0; (idx < e820_size) && (e820[idx+1].type != 1); idx++){
+	for (uint16_t idx = 0; (idx < e820_size) && (e820[idx].type == 1); idx++){
 		for (addr = e820[idx].base; addr < (e820[idx].base + e820[idx].length); addr += 0x1000) {
 			curr_pages[pcount & 1023] = addr;
 			if ((pcount & 1023) == 1023) {
@@ -34,7 +34,7 @@ uint32_t pmm_alloc_ppage(void) {
 
 	if (pfree != 0) {
 		if ((pidx & 1023) == 1023) {
-			paddr = pt_map(curr_pages[1023], curr_pages, PRESENT | RW);
+			paddr = pt_map(curr_pages[1023], curr_pages, PRESENT | RW) & PT_PAGE_MASK;
 		} else {
 			paddr = curr_pages[pidx & 1023];
 		}
@@ -46,13 +46,16 @@ uint32_t pmm_alloc_ppage(void) {
 }
 
 void pmm_free_ppage(uint32_t paddr) {
-	if ((pidx & 1023) == 0) {
-		paddr = pt_map(paddr, curr_pages, PRESENT | RW);
+	pidx--;
+	if ((pidx & 1023) == 1023) {
+		paddr = pt_map(paddr, curr_pages, PRESENT | RW) & PT_PAGE_MASK;
 		curr_pages[1023] = paddr;
 	} else {
-		curr_pages[(++pidx) & 1023] = paddr;
+		curr_pages[pidx & 1023] = paddr;
 	}
-	
-	pidx--;
-	pfree--;
+	pfree++;
+}
+
+uint32_t pmm_free_pages(void) {
+	return pfree;
 }

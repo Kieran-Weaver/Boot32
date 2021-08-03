@@ -10,6 +10,13 @@ extern "C" {
 typedef uint32_t* vaddr_t;
 typedef uint32_t  paddr_t;
 
+struct __attribute__((aligned(4096))) page {
+	struct page *addrs[1024 / sizeof(struct page*)];
+};
+
+#define PT_PAGE_MASK  0xFFFFF000
+#define PT_FLAGS_MASK 0x00000FFF
+
 enum PT {          // Set           / Unset
 	PRESENT = 1,   // Present       / not present
 	RW      = 2,   // Read+Write    / Read only
