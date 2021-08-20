@@ -6,12 +6,13 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#define PAGE_SIZE 4096
 
 typedef uint32_t* vaddr_t;
 typedef uint32_t  paddr_t;
 
-struct __attribute__((aligned(4096))) page {
-	struct page *addrs[1024 / sizeof(struct page*)];
+struct __attribute__((aligned(PAGE_SIZE))) page {
+	struct page *addrs[PAGE_SIZE / sizeof(struct page*)];
 };
 
 #define PT_PAGE_MASK  0xFFFFF000
