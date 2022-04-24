@@ -24,7 +24,7 @@ void* slabp_alloc(struct slab_page* slb) {
 
 void  slabp_free(struct slab_page* slb, void* data) {
 	uint32_t* block = (uint32_t*)data;
-	uint32_t offset = block - &(data[0]);
+	uint32_t offset = block - (uint32_t*)(&(slb->data[0]));
 
 	assert((offset >= 0) && (offset < SLABP_SIZE));
 	

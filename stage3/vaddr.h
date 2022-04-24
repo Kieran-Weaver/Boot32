@@ -28,23 +28,36 @@ enum PT {          // Set           / Unset
 	DIRTY   = 64,  // Dirty         / Clean
 	SIZE    = 128, // 4MiB Page     / 4KiB Page
 	GLOBAL  = 256, // Global        / Not Global
-	RANGE   = 512, // Start or end of range
-	SWAP    = 1024, // Swapped out
-	FULL    = 2048 // No more space
+//  Types of page, sets AVL bits
+	RAM_FREE = 0,
+	MMAP_PRESENT = 512,
+	MMAP_NOT_PRESENT = 1024,
+	RAM_PRESENT = (512 * 3),
+	RAM_ALLOC_ON_WRITE = (512 * 4),
+	RAM_SWAP = (512 * 5),
+	UNUSABLE = (512 * 6)
 };
 
+/* Physical memory management */
 // Get paddr from current page table
 paddr_t  get_paddr(vaddr_t vaddr);
-// Initialize valloc and vfree
-void     vinit();
-// Allocate virtual pages
-vaddr_t  valloc(uint32_t pages);
-// Free virtual pages
-void vfree(vaddr_t vaddr);
+// Get flags from current page table
+uint32_t get_flags(vaddr_t vaddr);
 // Map a single virtual page
 paddr_t  pt_map(paddr_t paddr, vaddr_t vaddr, uint32_t flags);
 // Unmap a single virtual page
 uint32_t pt_unmap(vaddr_t vaddr);
+
+/* Virtual memory management */
+// Initialize valloc and vfree
+void     vinit(void);
+// Allocate virtual page
+vaddr_t  valloc(void);
+// Free virtual page
+void     vfree(vaddr_t vaddr);
+// Replace virtual page's flags with new flags
+void     vmark(vaddr_t vaddr, uint32_t flags);
+
 
 #ifdef __cplusplus
 }

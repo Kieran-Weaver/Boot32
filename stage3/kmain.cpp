@@ -49,6 +49,9 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 		screen += 160;
 	}
 	
+	vinit();
+	vfree(valloc());
+	
 	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, screen, strlen(freestr));
