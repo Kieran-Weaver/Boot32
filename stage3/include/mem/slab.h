@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "vaddr.h"
+#include <mem/vaddr.h>
 
 #ifdef __cplusplus
 extern "C" {

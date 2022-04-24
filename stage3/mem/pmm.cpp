@@ -1,6 +1,6 @@
-#include "pmm.h"
-#include "util.h"
-#include "vaddr.h"
+#include <mem/pmm.h>
+#include <crt/util.h>
+#include <mem/vaddr.h>
 
 extern char   BOOT_BEGIN[];
 static uint32_t pcount; // Number of total pages

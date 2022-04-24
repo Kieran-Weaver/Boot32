@@ -1,5 +1,5 @@
-#include "slab.h"
-#include "assert.h"
+#include <mem/slab.h>
+#include <crt/assert.h>
 
 void  slabp_init(struct slab_page* slb, uint16_t size) {
 	assert((size > 1) && (size < SLABP_SIZE));

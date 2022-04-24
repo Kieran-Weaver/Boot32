@@ -1,4 +1,4 @@
-#include "util.h"
+#include <crt/util.h>
 
 // If any of the bytes in X have a value less than N
 #define HASLESS(x,n) (((x)-~0UL/255*(n))&~(x)&~0UL/255*128)

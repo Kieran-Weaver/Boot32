@@ -1,5 +1,6 @@
-#include "ata.h"
-#include "intrinsics.h"
+#include <x86/ata.h>
+#include <x86/intrinsics.h>
+
 uint8_t ata_get_status(uint32_t ctl_base){
 	return inb(ctl_base + ATA_CTL_STATUS);
 }

@@ -1,7 +1,7 @@
 CC=i686-elf-gcc
 CXX=i686-elf-g++
 CFLAGS= -Os
-CPPFLAGS= -MT $@ -MMD -MP -MF build/$*.d
+CPPFLAGS= -MT $@ -MMD -MP -MF build/$*.d -I stage3/include
 CXXFLAGS= -Os -std=c++11 -fno-exceptions -fno-rtti
 ASM=nasm
 MUSL_SRCS=musl/src/string/i386/memcpy.s musl/src/string/i386/memmove.s \
@@ -43,7 +43,7 @@ stage2.bin: stage2/stage2.ld build/stage2/crt0.o $(STAGE2_OBJS)
 	$(CC) -Os -T stage2/stage2.ld $(STAGE2_OBJS) -o stage2.bin -nostdlib -ffreestanding
 	rm -f stage2/crt0.o
 
-root/kernel.elf: stage3/stage3.ld build/stage3/crt0.o $(STAGE3_OBJS)
+root/kernel.elf: stage3/stage3.ld build/stage3/crt/crt0.o $(STAGE3_OBJS)
 	mkdir -p root
 	cp build/stage3/crt0.o stage3/crt0.o
 	$(CC) -Os -T stage3/stage3.ld $(STAGE3_OBJS) -o root/kernel.elf -nostdlib -ffreestanding

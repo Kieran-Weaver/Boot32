@@ -1,6 +1,6 @@
-#include "pagetable.h"
-#include "intrinsics.h"
-#include "vaddr.h"
+#include <mem/pagetable.h>
+#include <x86/intrinsics.h>
+#include <mem/vaddr.h>
 
 PageTable::PageTable(vaddr_t newPD) {
 	this->paddr = get_paddr(newPD);

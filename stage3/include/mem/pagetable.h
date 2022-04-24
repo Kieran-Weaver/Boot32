@@ -1,7 +1,7 @@
 #ifndef PAGETABLE_H
 #define PAGETABLE_H
 
-#include "vaddr.h"
+#include <mem/vaddr.h>
 
 class PageTable {
 public:

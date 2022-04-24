@@ -7,7 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
-#include "e820.h"
+#include <x86/e820.h>
 
 void     pmm_init(SMAP32_t* memmap, size_t e820_size);
 uint32_t pmm_alloc_ppage(void);

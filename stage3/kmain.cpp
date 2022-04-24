@@ -1,8 +1,9 @@
 #include <stdint.h>
-#include "e820.h"
-#include "util.h"
-#include "pagetable.h"
-#include "pmm.h"
+#include <x86/e820.h>
+#include <crt/util.h>
+#include <mem/pagetable.h>
+#include <mem/pmm.h>
+#include <mem/vaddr.h>
 
 void kprint(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){

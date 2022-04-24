@@ -1,7 +1,7 @@
-#include "vaddr.h"
-#include "pagetable.h"
-#include "intrinsics.h"
-#include "sort.h"
+#include <mem/vaddr.h>
+#include <mem/pagetable.h>
+#include <x86/intrinsics.h>
+#include <crt/sort.h>
 
 /* Physical memory management */
 
