@@ -4,8 +4,8 @@
 #define HASLESS(x,n) (((x)-~0UL/255*(n))&~(x)&~0UL/255*128)
 #define MASK(x) ((1 << x) - 1)
 
-int strlen(const uint8_t* str) {
-	const uint8_t* s;
+int strlen(const char* str) {
+	const char* s;
 	const uint32_t* w;
 
 	for (s = str; ((uintptr_t)s) & MASK(sizeof(uintptr_t)); s++) {
@@ -16,7 +16,7 @@ int strlen(const uint8_t* str) {
 
 	for (w = (const uint32_t*)s; !HASLESS(*w, 1); ++w){}
 	
-	for (s = (const uint8_t*)w; *s; s++) {}
+	for (s = (const char*)w; *s; s++) {}
 
 	return (s - str);
 }
