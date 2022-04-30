@@ -38,7 +38,6 @@ enum PT {          // Set           / Unset
 	UNUSABLE = (512 * 6)
 };
 
-/* Physical memory management */
 // Get paddr from current page table
 paddr_t  get_paddr(vaddr_t vaddr);
 // Get flags from current page table
@@ -47,17 +46,8 @@ uint32_t get_flags(vaddr_t vaddr);
 paddr_t  pt_map(paddr_t paddr, vaddr_t vaddr, uint32_t flags);
 // Unmap a single virtual page
 uint32_t pt_unmap(vaddr_t vaddr);
-
-/* Virtual memory management */
-// Initialize valloc and vfree
-void     vinit(void);
-// Allocate virtual page
-vaddr_t  valloc(void);
-// Free virtual page
-void     vfree(vaddr_t vaddr);
 // Replace virtual page's flags with new flags
 void     vmark(vaddr_t vaddr, uint32_t flags);
-
 
 #ifdef __cplusplus
 }

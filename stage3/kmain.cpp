@@ -4,6 +4,8 @@
 #include <mem/pagetable.h>
 #include <mem/pmm.h>
 #include <mem/vaddr.h>
+#include <mem/kmalloc.h>
+#include <crt/assert.h>
 
 void kprint(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
@@ -25,6 +27,8 @@ void clear(volatile uint8_t* screen) {
 		screen[i] = 0;
 	}
 }
+
+static volatile vaddr_t vaddrs[8192];
 
 extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	volatile uint8_t* screen = (uint8_t*)0xB8000;
@@ -51,9 +55,18 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	}
 	
 	vinit();
-	vfree(valloc());
-	
 	free_pages = pmm_free_pages();
+	
+	for (uint32_t i = 0; i < 8192; i++) {
+		vaddrs[i] = valloc();
+	}
+	
+	for (uint32_t i = 0; i < 8192; i++) {
+		vfree(vaddrs[i]);
+	}
+
+	assert(free_pages == pmm_free_pages());
+//	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, screen, strlen(freestr));
 	screen += 160;
