@@ -17,14 +17,10 @@ loadPageDirectory:
 
 .globl loadGDT
 loadGDT:
-	mov   4(%esp), %eax
-	mov   $gdtr, %edx
-	mov   %eax, 2(%edx)
-	mov   8(%esp), %ax
-	mov   %ax, (%edx)
+	mov   4(%esp), %edx
 	lgdt  (%edx)
-	pushl 16(%esp)
-	pushl 16(%esp)
+	pushl 12(%esp)
+	pushl 12(%esp)
 	call setSegments
 	add $8, %esp
 	mov $0x28, %ax
@@ -58,7 +54,19 @@ GDT:
 GDT_TSSEntry:
 	.quad 0x0  // TSS, offset 0x28
 
+.align 16
+.globl IDT
+IDT:
+	.quad 
+
+.align 4
 gdtr:
+	.word 0 // for limit storage
+	.word 0
+	.word 0 // for base storage
+
+.align 4
+idtr:
 	.word 0 // for limit storage
 	.word 0
 	.word 0 // for base storage

@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-[[noreturn]] void __assert_fail (const char *, const char *, int, const char *);
+__attribute__((noreturn)) void __assert_fail (const char *, const char *, int, const char *);
 
 #ifdef __cplusplus
 }

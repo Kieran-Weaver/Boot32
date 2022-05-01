@@ -23,6 +23,14 @@ static inline void rep_insw(uint16_t port, uint16_t* buf, uint32_t ecx){
 			"=c" (ecx):"d" (port), "0" (buf), "1" (ecx));
 }
 
+static inline void cli(void) {
+	asm volatile ("cli");
+}
+
+static inline void sti(void) {
+	asm volatile ("sti");
+}
+
 static inline uint32_t read_cr4(void)
 {
     uint32_t val;

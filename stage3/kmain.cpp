@@ -51,7 +51,7 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	char freestr[] = "Free pages: 0x00000000\r\n";
 	char errorstr[] = "Error: invalid page 0x00000000\r\n";
 	
-	gdt_set_tss(&tss);
+	GDT_init(&tss);
 	
 	PageTable pt((vaddr_t)0xFFFFF000);
 	pt.activate();
@@ -115,6 +115,10 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
+	
+	IDT_init();
+	/* Divide by 0 to intentionally cause interrupt */
+	asm volatile ("xor %bx, %bx; divw %bx");
 	
 	assert(0);
 }

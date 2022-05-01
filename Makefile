@@ -7,11 +7,11 @@ ASM=nasm
 MUSL_SRCS=musl/src/string/i386/memcpy.s musl/src/string/i386/memmove.s \
 musl/src/string/i386/memset.s
 STAGE2_SRCS=$(shell find stage2/ -path "*.c")
-STAGE3_SRCS=$(shell find stage3/ -path "*.c") $(shell find stage3/ -path "*.cpp") $(MUSL_SRCS)
+STAGE3_SRCS=$(shell find stage3/ -path "*.c") $(shell find stage3/ -path "*.cpp") $(shell find stage3/ -path "*.cc") $(MUSL_SRCS)
 STAGE2_OBJS=$(patsubst %.c, build/%.o, $(STAGE2_SRCS))
 STAGE2_DEPS=$(patsubst %.c, build/%.d, $(STAGE2_SRCS))
-STAGE3_OBJS=$(patsubst %.s, build/%.o, $(patsubst %.cpp, build/%.o, $(patsubst %.c, build/%.o, $(STAGE3_SRCS))))
-STAGE3_DEPS=$(patsubst %.s, build/%.d, $(patsubst %.cpp, build/%.d, $(patsubst %.c, build/%.d, $(STAGE3_SRCS))))
+STAGE3_OBJS=$(patsubst %.cc, build/%.o, $(patsubst %.s, build/%.o, $(patsubst %.cpp, build/%.o, $(patsubst %.c, build/%.o, $(STAGE3_SRCS)))))
+STAGE3_DEPS=$(patsubst %.cc, build/%.d, $(patsubst %.s, build/%.d, $(patsubst %.cpp, build/%.d, $(patsubst %.c, build/%.d, $(STAGE3_SRCS)))))
 MB=128
 STAGE3_SECTORS=$(shell echo "$(MB) * 2048 - 51" | bc)
 all: hda.img
@@ -26,6 +26,10 @@ build/%.o: %.S
 build/%.o: %.s
 	mkdir -p $(dir $@)
 	$(CC) $^ -c -o $@
+
+build/%.o: %.cc
+	mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CFLAGS) -mgeneral-regs-only $< -c -o $@ -ffreestanding
 
 build/%.o: %.c
 	mkdir -p $(dir $@)
