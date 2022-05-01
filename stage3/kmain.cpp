@@ -7,6 +7,7 @@
 #include <mem/kmalloc.h>
 #include <crt/assert.h>
 #include <x86/serial.h>
+#include <x86/gdt.h>
 
 static struct serial port;
 
@@ -38,6 +39,7 @@ void clear(volatile uint8_t* screen) {
 }
 
 static volatile vaddr_t vaddrs[8192];
+static struct TSS tss;
 
 extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	volatile uint8_t* screen = (uint8_t*)0xB8000;
@@ -48,6 +50,9 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	char str[] = " 0x00000000 | 0x0009FC00 | 1\r\n";
 	char freestr[] = "Free pages: 0x00000000\r\n";
 	char errorstr[] = "Error: invalid page 0x00000000\r\n";
+	
+	gdt_set_tss(&tss);
+	
 	PageTable pt((vaddr_t)0xFFFFF000);
 	pt.activate();
 	pmm_init(e820, e820_size);
@@ -86,13 +91,11 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 //	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
-	screen += 160;
 	temp_page = pmm_alloc_ppage();
 	for (uint32_t i = 0; i < free_pages; i++) {
 		if ((temp_page & 1023) != 0) {
 			hextostr(temp_page, errorstr + 22);
 			kprint(errorstr, strlen(errorstr));
-			screen += 160;
 		}
 		temp_page = pmm_alloc_ppage();
 		pmm_free_ppage(temp_page);
@@ -101,20 +104,17 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
-	screen += 160;
 	for (uint32_t i = 0; i < free_pages; i++) {
 		temp_page = pmm_alloc_ppage();
 		if ((temp_page & 1023) != 0) {
 			hextostr(temp_page, errorstr + 22);
 			kprint(errorstr, strlen(errorstr));
-			screen += 160;
 		}
 	}
 
 	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
-	screen += 160;
 	
 	assert(0);
 }
