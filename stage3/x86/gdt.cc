@@ -19,17 +19,50 @@ struct interrupt_frame {
 	uint32_t ss;
 };
 
-__attribute__((interrupt)) void isr_div0(struct interrupt_frame* frame) {
-	assert(0);
+#define ISR_NO_ERR_STUB(N, MSG) \
+__attribute__((interrupt)) void isr_stub##N(struct interrupt_frame* frame) { \
+	panic("Unexpected exception: " MSG); \
 }
 
-__attribute__((interrupt)) void isr_no_err_stub(struct interrupt_frame* frame) {
-	assert(0);
+#define ISR_ERR_STUB(N, MSG) \
+__attribute__((interrupt)) void isr_stub##N(struct interrupt_frame* frame, uint32_t error_code) { \
+	panic("Unexpected exception: " MSG ", error code 0x%x", error_code); \
 }
 
-__attribute__((interrupt)) void isr_err_stub(struct interrupt_frame* frame, uint32_t error_code) {
-	assert(0);
-}
+#define IDT_STUB(N) IDT_setIRQ(N, (void*)(isr_stub##N), IRQ_INT);
+
+ISR_NO_ERR_STUB(0, "Division By 0")
+ISR_NO_ERR_STUB(1, "Debug Trap")
+ISR_NO_ERR_STUB(2, "NMI")
+ISR_NO_ERR_STUB(3, "Breakpoint")
+ISR_NO_ERR_STUB(4, "Overflow")
+ISR_NO_ERR_STUB(5, "Bound Range Exceeded")
+ISR_NO_ERR_STUB(6, "Invalid Opcode")
+ISR_NO_ERR_STUB(7, "Device Not Available")
+ISR_ERR_STUB(8, "Double Fault")
+ISR_NO_ERR_STUB(9, "Coprocessor Segment Overrun")
+ISR_ERR_STUB(10, "Invalid TSS")
+ISR_ERR_STUB(11, "Segment Not Present")
+ISR_ERR_STUB(12, "Stack Segment Fault")
+ISR_ERR_STUB(13, "General Protection Fault")
+ISR_ERR_STUB(14, "Page Fault")
+ISR_NO_ERR_STUB(15, "Reserved 0xF")
+ISR_NO_ERR_STUB(16, "x87 Exception")
+ISR_ERR_STUB(17, "Alignment Check")
+ISR_NO_ERR_STUB(18, "Machine Check")
+ISR_NO_ERR_STUB(19, "SIMD Exception")
+ISR_NO_ERR_STUB(20, "Virtualization Exception")
+ISR_ERR_STUB(21, "Control Protection Exception")
+ISR_NO_ERR_STUB(22, "Reserved 0x16")
+ISR_NO_ERR_STUB(23, "Reserved 0x17")
+ISR_NO_ERR_STUB(24, "Reserved 0x18")
+ISR_NO_ERR_STUB(25, "Reserved 0x19")
+ISR_NO_ERR_STUB(26, "Reserved 0x1A")
+ISR_NO_ERR_STUB(27, "Reserved 0x1B")
+ISR_NO_ERR_STUB(28, "Hypervisor Injection Exception")
+ISR_ERR_STUB(29, "VMM Communication Exception")
+ISR_ERR_STUB(30, "Security Exception")
+ISR_NO_ERR_STUB(31, "Reserved 0x1F")
 
 void GDT_init(const struct TSS* tss) {
 	gdtr.offset = (uint32_t)(&GDT[0]);
@@ -45,25 +78,42 @@ void GDT_init(const struct TSS* tss) {
 }
 
 void IDT_init(void) {
-	const uint8_t is_error[] = {
-		0, 0, 0, 0, 0, 0, 0, 0,
-		1, 0, 1, 1, 1, 1, 1, 0,
-		0, 1, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 1, 0
-	};
-
+	IDT_STUB(0);
+	IDT_STUB(1);
+	IDT_STUB(2);
+	IDT_STUB(3);
+	IDT_STUB(4);
+	IDT_STUB(5);
+	IDT_STUB(6);
+	IDT_STUB(7);
+	IDT_STUB(8);
+	IDT_STUB(9);
+	IDT_STUB(10);
+	IDT_STUB(11);
+	IDT_STUB(12);
+	IDT_STUB(13);
+	IDT_STUB(14);
+	IDT_STUB(15);
+	IDT_STUB(16);
+	IDT_STUB(17);
+	IDT_STUB(18);
+	IDT_STUB(19);
+	IDT_STUB(20);
+	IDT_STUB(21);
+	IDT_STUB(22);
+	IDT_STUB(23);
+	IDT_STUB(24);
+	IDT_STUB(25);
+	IDT_STUB(26);
+	IDT_STUB(27);
+	IDT_STUB(28);
+	IDT_STUB(29);
+	IDT_STUB(30);
+	IDT_STUB(31);
+	
 	idtr.offset = (uint32_t)(&IDT[0]);
 	idtr.size   = (uint16_t)sizeof(struct IDTEntry) * MAX_IRQ - 1;
 
-	IDT_setIRQ(0, (void*)isr_div0, IRQ_INT);
-	for (uint8_t vector = 1; vector < 32; vector++) {
-		if (is_error[vector]) {
-			IDT_setIRQ(vector, (void*)isr_err_stub, IRQ_INT);
-		} else {
-			IDT_setIRQ(vector, (void*)isr_no_err_stub, IRQ_INT);
-		}
-	}
-	
 	asm volatile ("lidt %0" : : "m"(idtr));
 }
 
