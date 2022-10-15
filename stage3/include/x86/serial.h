@@ -51,6 +51,8 @@ struct serial {
 	uint8_t  speed;
 };
 
+/* COM1, 38400 baud, no interrupts or FIFO */
+void ser_init_poll(void);
 bool ser_init(const struct serial* port);
 /* Write functions */
 bool ser_ready(const struct serial* port);

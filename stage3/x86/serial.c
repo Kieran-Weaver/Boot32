@@ -52,6 +52,20 @@
 #define IRQ 0x08
 #define LOOPBACK 0x10
 
+void ser_init_poll(void) {
+	outb(COM1 + IER, 0x00); /* Disable interrupts */
+	outb(COM1 + LCR, DLAB); /* Enable DLAB */
+	/* Set divisor to 38400 */
+	outb(COM1 + DIVL, 3);
+	outb(COM1 + DIVH, 0);
+	/* Set 8N1 mode */
+	outb(COM1 + LCR, DATA_8 | STOP_1 | PARITY_NONE);
+	/* Disable + clear FIFOs */
+	outb(COM1 + FCR, 0);
+	/* Disable IRQs, set RTS / DTR */	
+	outb(COM1 + MCR, DTR | RTS);
+}
+
 bool ser_init(const struct serial* port) {
 	const uint16_t bauds[] = {
 		65535, // B0

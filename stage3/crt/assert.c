@@ -1,45 +1,49 @@
 #include <x86/serial.h>
+#include <x86/intrinsics.h>
+#include <crt/print.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static const char assert_txt[] = "Assertion failed: ";
+static const char assert_fmt[] = "Assertion failed: %s, (%s: %s: %u)";
 static struct serial port;
-static char tmp_buf[13];
+static char tmp_buf[16];
 
-static void assert_print(const char* str) {
-	port.port = COM1;
-	port.speed = B115200;
-
-	for (uint16_t i = 0; str[i]; i++) {
-		ser_write(&port, str[i]);
-	}
+static void assert_ser_write(char c) {
+	/* Write single char to COM1 */
+	while ((inb(COM1 + 5) & 0x20) != 0x20) {}
+	outb(COM1, c);
 }
 
-static char* assert_itoa(char* str, int x) {
-	str += 12;
-	*(--str) = '\0';
-	do {
-		*(--str) = '0' + (x % 10);
-		x /= 10;
-	} while (x);
-	return str;
+void panic(const char* fmt, ...) {
+	va_list args;
+    va_start(args, fmt);
+    
+    cli();
+    ser_init_poll();
+    
+    while (*fmt) {
+		if (*fmt == '%') {
+			const char* buf = getfmt(*(++fmt), tmp_buf, &args);
+			while (*buf) {
+				assert_ser_write(*(buf++));
+			}
+		} else {
+			assert_ser_write(*fmt);
+		}
+        ++fmt;
+    }
+ 
+    va_end(args);
+    
+    while (1)
+		hang();
 }
 
 void __assert_fail (const char * x, const char * file, int line, const char * func) {
-	assert_print(assert_txt);
-	assert_print(x);
-	assert_print(" (");
-	assert_print(file);
-	assert_print(": ");
-	assert_print(func);
-	assert_print(": ");
-	assert_print(assert_itoa(tmp_buf, line));
-	assert_print(") \r\n");
-		
-	while (1)
-		asm("cli; hlt");
+	panic(assert_fmt, x, file, func, line);
 }
 
 #ifdef __cplusplus
