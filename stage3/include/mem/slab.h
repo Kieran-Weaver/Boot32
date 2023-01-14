@@ -3,12 +3,14 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <mem/vaddr.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define SLAB_SENTINEL 0xFFFFFFFF
 #define SLABP_SIZE ((PAGE_SIZE / sizeof(uint32_t)) - 2)
 
 struct __attribute__((aligned(PAGE_SIZE))) slab_page {
@@ -19,6 +21,7 @@ struct __attribute__((aligned(PAGE_SIZE))) slab_page {
 };
 
 void  slabp_init(struct slab_page* slb, uint16_t size);
+bool  slabp_full(const struct slab_page* slb);
 void* slabp_alloc(struct slab_page* slb);
 void  slabp_free(struct slab_page* slb, void* data);
 

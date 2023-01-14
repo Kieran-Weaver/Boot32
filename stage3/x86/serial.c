@@ -21,7 +21,6 @@
 #define FIFO_8   0x80
 #define FIFO_14  0xC0
 /* Extra commands */
-#define FIFO_64  0x20
 #define FIFO_DMA 0x08
 #define CLEAR_TX 0x04
 #define CLEAR_RX 0x02
@@ -96,7 +95,7 @@ bool ser_init(const struct serial* port) {
 	/* Set 8N1 mode */
 	outb(port->port + LCR, DATA_8 | STOP_1 | PARITY_NONE);
 	/* Enable + clear FIFOs, with maximum threshold */
-	outb(port->port + FCR, FIFO_14 | FIFO_64 | CLEAR_RX | CLEAR_TX | FIFO_EN);
+	outb(port->port + FCR, FIFO_14 | CLEAR_RX | CLEAR_TX | FIFO_EN);
 	/* Enable IRQs, set RTS / DTR */
 	outb(port->port + MCR, RTS | DTR | IRQ);
 	/* Set loopback mode, test chip */
