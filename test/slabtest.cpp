@@ -49,6 +49,8 @@ TEST_CASE( "Slab allocator allocates all unique elements" ) {
 		
 		elements.insert( elem );
 	}
+	
+	REQUIRE(elements.size() > ( sizeof(slb) / (2 * sizeof(uint32_t)) ));
 }
 
 TEST_CASE( "Slab allocator can alloc and free" ) {
