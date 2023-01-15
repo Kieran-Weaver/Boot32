@@ -1,6 +1,6 @@
 CC=i686-elf-gcc
 CXX=i686-elf-g++
-CFLAGS= -Og -g -std=gnu11
+CFLAGS= -Og -g
 CPPFLAGS= -MT $@ -MMD -MP -MF build/$*.d -I stage3/include
 CXXFLAGS= -Og -g -std=c++11 -fno-exceptions -fno-rtti
 ASM=nasm
