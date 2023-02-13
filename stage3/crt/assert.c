@@ -8,7 +8,6 @@ extern "C" {
 #endif
 
 static const char assert_fmt[] = "Assertion failed: %s, (%s: %s: %u)";
-static struct serial port;
 static char tmp_buf[16];
 
 static void assert_ser_write(char c) {

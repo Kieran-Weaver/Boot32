@@ -6,16 +6,41 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+
+#define EFLAGS_CF  (1 << 0)
+#define EFLAGS_PF  (1 << 2)
+#define EFLAGS_AF  (1 << 4)
+#define EFLAGS_ZF  (1 << 6)
+#define EFLAGS_SF  (1 << 7)
+#define EFLAGS_TF  (1 << 8)
+#define EFLAGS_IF  (1 << 9)
+#define EFLAGS_DF  (1 << 10)
+#define EFLAGS_OF  (1 << 11)
+#define EFLAGS_IOPL ((1 << 12) | (1 << 13))
+#define EFLAGS_NT  (1 << 14)
+#define EFLAGS_RF  (1 << 16)
+#define EFLAGS_VM  (1 << 17)
+#define EFLAGS_AC  (1 << 18)
+#define EFLAGS_VIF (1 << 19)
+#define EFLAGS_VIP (1 << 20)
+#define EFLAGS_ID  (1 << 21)
+
+static inline uint32_t read_eflags(void) {
+	uint32_t ret;
+	asm volatile ( "pushfl ; pop %0" : "=a"(ret) : );
+	return ret;	
+}
+
 static inline void outb(uint16_t port, uint8_t val){
 	asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
 }
 
 static inline uint8_t inb(uint16_t port){
-    uint8_t ret;
-    asm volatile ( "inb %1, %0"
-                   : "=a"(ret)
-                   : "Nd"(port) );
-    return ret;
+	uint8_t ret;
+	asm volatile ( "inb %1, %0"
+			: "=a"(ret)
+			: "Nd"(port) );
+	return ret;
 }
 
 static inline void rep_insw(uint16_t port, uint16_t* buf, uint32_t ecx){
@@ -35,16 +60,28 @@ static inline void sti(void) {
 	asm volatile ("sti");
 }
 
+static inline uint32_t save_intr(void) {
+	uint32_t flags = read_eflags();
+	cli();
+	return flags & EFLAGS_IF;
+}
+
+static inline void restore_intr(uint32_t eflags) {
+	if ( eflags ) {
+		sti();
+	}
+}
+
 static inline uint32_t read_cr4(void)
 {
-    uint32_t val;
-    asm volatile ( "mov %%cr4, %0" : "=r"(val) );
-    return val;
+	uint32_t val;
+	asm volatile ( "mov %%cr4, %0" : "=r"(val) );
+	return val;
 }
 
 static inline void invlpg(void* m)
 {
-    asm volatile ( "invlpg (%0)" : : "b"(m) : "memory" );
+	asm volatile ( "invlpg (%0)" : : "b"(m) : "memory" );
 }
 
 static inline uint16_t bswap16(uint16_t x)
