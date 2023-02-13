@@ -66,32 +66,11 @@ void ser_init_poll(void) {
 }
 
 bool ser_init(const struct serial* port) {
-	const uint16_t bauds[] = {
-		65535, // B0
-		2304, // B50
-		1536, // B75
-		1047, // B110
-		859,  // B134
-		768,  // B150
-		576,  // B200
-		384,  // B300
-		192,  // B600
-		96,   // B1200
-		64,   // B1800
-		48,   // B2400
-		24,   // B4800
-		12,   // B9600
-		6,    // B19200
-		3,    // B38400
-		2,    // B57600
-		1     // B115200
-	};
-
 	outb(port->port + IER, 0x00); /* Disable interrupts */
 	outb(port->port + LCR, DLAB); /* Enable DLAB */
 	/* Set divisor */
-	outb(port->port + DIVL, bauds[port->speed] & 0xFF);
-	outb(port->port + DIVH, bauds[port->speed] >> 8);
+	outb(port->port + DIVL, port->speed & 0xFF);
+	outb(port->port + DIVH, port->speed >> 8);
 	/* Set 8N1 mode */
 	outb(port->port + LCR, DATA_8 | STOP_1 | PARITY_NONE);
 	/* Enable + clear FIFOs, with maximum threshold */
