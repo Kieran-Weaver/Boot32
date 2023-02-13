@@ -27,7 +27,7 @@ extern "C" {
 
 static inline uint32_t read_eflags(void) {
 	uint32_t ret;
-	asm volatile ( "pushfl ; pop %0" : "=a"(ret) : );
+	asm volatile ( "pushfl; pop %0" : "=g"(ret) : );
 	return ret;	
 }
 
@@ -61,15 +61,13 @@ static inline void sti(void) {
 }
 
 static inline uint32_t save_intr(void) {
-	uint32_t flags = read_eflags();
-	cli();
-	return flags & EFLAGS_IF;
+	uint32_t ret;
+	asm volatile ( "pushfl; cli; pop %0" : "=r"(ret) : : "memory" );
+	return ret;
 }
 
 static inline void restore_intr(uint32_t eflags) {
-	if ( eflags ) {
-		sti();
-	}
+	asm volatile ( "push %0; popf" : : "rm"(eflags) : "memory","cc" );
 }
 
 static inline uint32_t read_cr4(void)
@@ -82,6 +80,11 @@ static inline uint32_t read_cr4(void)
 static inline void invlpg(void* m)
 {
 	asm volatile ( "invlpg (%0)" : : "b"(m) : "memory" );
+}
+
+static inline void io_wait(void)
+{
+	outb(0x80, 0);
 }
 
 static inline uint16_t bswap16(uint16_t x)
