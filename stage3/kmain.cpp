@@ -8,6 +8,9 @@
 #include <crt/assert.h>
 #include <x86/serial.h>
 #include <x86/gdt.h>
+#include <x86/pic.h>
+#include <x86/intrinsics.h>
+#include <x86/isrs.h>
 
 static struct serial port;
 
@@ -117,8 +120,13 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	kprint(freestr, strlen(freestr));
 	
 	IDT_init();
-	/* Divide by 0 to intentionally cause interrupt */
-	asm volatile ("xor %bx, %bx; divw %bx");
+	pic_init(0x20);
+	/* IRQ mask: Only PIT enabled */
+	pic_irqmask(0xFFFE);
+	/* PIC interrupt 0 (PIT) */
+	IDT_setIRQ(0x20, (void*)timer_isr, IRQ_INT);
+	sti();
+	halt();
 	
 	assert(0);
 }

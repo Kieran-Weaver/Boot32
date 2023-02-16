@@ -29,7 +29,8 @@ __attribute__((interrupt)) void isr_stub##N(struct interrupt_frame* frame, uint3
 	panic("Unexpected exception: " MSG ", error code 0x%x", error_code); \
 }
 
-#define IDT_STUB(N) IDT_setIRQ(N, (void*)(isr_stub##N), IRQ_INT);
+#define IDT_STUB(N) IDT_setIRQ(N, (void*)(isr_stub##N), IRQ_TRAP);
+#define NMI_STUB(N) IDT_setIRQ(N, (void*)(isr_stub##N), IRQ_INT);
 
 ISR_NO_ERR_STUB(0, "Division By 0")
 ISR_NO_ERR_STUB(1, "Debug Trap")
@@ -80,7 +81,7 @@ void GDT_init(const struct TSS* tss) {
 void IDT_init(void) {
 	IDT_STUB(0);
 	IDT_STUB(1);
-	IDT_STUB(2);
+	NMI_STUB(2);
 	IDT_STUB(3);
 	IDT_STUB(4);
 	IDT_STUB(5);
