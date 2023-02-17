@@ -12,8 +12,8 @@ static char tmp_buf[16];
 
 static void assert_ser_write(char c) {
 	/* Write single char to COM1 */
-	while ((inb(COM1 + 5) & 0x20) != 0x20) {}
-	outb(COM1, c);
+	while ((inb(SERIAL_COM1 + 5) & 0x20) != 0x20) {}
+	outb(SERIAL_COM1, c);
 }
 
 void panic(const char* fmt, ...) {

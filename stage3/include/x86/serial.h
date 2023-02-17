@@ -3,13 +3,19 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <mem/ringbuf.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define COM1 0x3F8
-#define COM2 0x2F8
+extern struct serial* COM1;
+extern struct serial* COM2;
+
+#define SERIAL_BUFSIZE 64
+#define SERIAL_FIFO 16
+#define SERIAL_COM1 0x3F8
+#define SERIAL_COM2 0x2F8
 
 typedef enum {
 	B0 = 65535,
@@ -49,17 +55,23 @@ typedef enum {
 struct serial {
 	uint16_t port;
 	uint8_t  speed;
+	uint8_t  fifo_empty;
+	bufhdr_t hdr;
+	uint8_t  buffer[SERIAL_BUFSIZE];
 };
 
 /* COM1, 38400 baud, no interrupts or FIFO */
 void ser_init_poll(void);
-bool ser_init(const struct serial* port);
+void ser_subsystem_init(void);
+bool ser_init(struct serial* port, int base, speed_t speed);
 /* Write functions */
-bool ser_ready(const struct serial* port);
-void ser_write(const struct serial* port, char c);
+int  ser_ready(const struct serial* port);
+int  ser_write(struct serial* port, const void* c, int n);
 /* Read functions */
 bool ser_avail(const struct serial* port);
 char ser_read(const struct serial* port);
+/* Internals */
+void ser_flush(struct serial* port);
 
 #ifdef __cplusplus
 }

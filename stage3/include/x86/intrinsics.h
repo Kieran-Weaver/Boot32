@@ -43,6 +43,10 @@ static inline uint8_t inb(uint16_t port){
 	return ret;
 }
 
+static inline void rep_outsb(uint16_t port, uint8_t* buf, uint32_t ecx) {
+	asm volatile ("cld ; rep ; outsb" : "+S"(buf), "+c"(ecx) : "d" (port) : "memory" );
+}
+
 static inline void rep_insw(uint16_t port, uint16_t* buf, uint32_t ecx){
 	asm volatile ("cld ; rep ; insw":"=D" (buf),
 			"=c" (ecx):"d" (port), "0" (buf), "1" (ecx));

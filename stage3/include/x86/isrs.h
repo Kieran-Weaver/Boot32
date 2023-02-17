@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 __attribute__((interrupt)) void timer_isr(struct interrupt_frame* frame);
+__attribute__((interrupt)) void com1_isr(struct interrupt_frame* frame);
 
 #ifdef __cplusplus
 }

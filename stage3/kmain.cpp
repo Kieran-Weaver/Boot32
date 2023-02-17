@@ -12,8 +12,6 @@
 #include <x86/intrinsics.h>
 #include <x86/isrs.h>
 
-static struct serial port;
-
 void printscreen(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
 		*(screen++) = in[i];
@@ -22,8 +20,13 @@ void printscreen(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 }
 
 void kprint(const char* str, uint16_t n) {
-	for (uint16_t i = 0; i < n; i++) {
-		ser_write(&port, str[i]);
+	int sent = 0;
+
+	while (n > 0) {
+		sent = ser_write(COM1, str, n);
+		if (!sent) halt();
+		str += sent;
+		n -= sent;
 	}
 }
 
@@ -61,11 +64,18 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	pmm_init(e820, e820_size);
 
 	clear(screen);
+	IDT_init();
 
-	port.port = COM1;
-	port.speed = B115200;
-	
-	if (!ser_init(&port)) {
+	pic_init(0x20);
+	/* IRQ mask: Only COM1 enabled */
+	pic_irqmask(0xFFFF & ~(1 << PIC_COM1));
+	/* PIC interrupt 4 (COM1) */
+	IDT_setIRQ(0x24, (void*)com1_isr, IRQ_INT);
+	sti();
+
+	ser_subsystem_init();
+
+	if (!ser_init(COM1, SERIAL_COM1, B115200)) {
 		printscreen(sErr, screen, strlen((const char*)sErr));
 		assert(0);
 	}
@@ -118,15 +128,6 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	free_pages = pmm_free_pages();
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
-	
-	IDT_init();
-	pic_init(0x20);
-	/* IRQ mask: Only PIT enabled */
-	pic_irqmask(0xFFFE);
-	/* PIC interrupt 0 (PIT) */
-	IDT_setIRQ(0x20, (void*)timer_isr, IRQ_INT);
-	sti();
-	halt();
 	
 	assert(0);
 }

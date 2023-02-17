@@ -6,6 +6,23 @@
 #define PIC_IRR 0x0A
 #define PIC_ISR 0x0B
 
+#define PIC_PIT   0
+#define PIC_KBD   1
+#define PIC_CASCADE 2
+#define PIC_COM2  3
+#define PIC_COM1  4
+#define PIC_LPT2  5
+#define PIC_FLP   6
+#define PIC_LPT1  7
+#define PIC_CMOS  8
+#define PIC_FREE1 9
+#define PIC_FREE2 10
+#define PIC_FREE3 11
+#define PIC_MOUSE 12
+#define PIC_FPU   13
+#define PIC_ATA1  14
+#define PIC_ATA2  15
+
 #ifdef __cplusplus
 extern "C" {
 #endif
