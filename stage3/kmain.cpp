@@ -71,6 +71,8 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	pic_irqmask(0xFFFF & ~(1 << PIC_COM1));
 	/* PIC interrupt 4 (COM1) */
 	IDT_setIRQ(0x24, (void*)com1_isr, IRQ_INT);
+	IDT_setIRQ(0x27, (void*)spurious_irq7_isr, IRQ_INT);
+	IDT_setIRQ(0x2F, (void*)spurious_irq15_isr, IRQ_INT);
 	sti();
 
 	ser_subsystem_init();

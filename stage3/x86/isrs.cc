@@ -18,4 +18,13 @@ __attribute__((interrupt)) void com1_isr(struct interrupt_frame* frame) {
 	pic_eoi(PIC_COM1);
 }
 
+__attribute__((interrupt)) void spurious_irq7_isr(struct interrupt_frame* frame) {
+	if (pic_read(PIC_ISR) & 0x80) pic_eoi(PIC_LPT1);
+}
+
+__attribute__((interrupt)) void spurious_irq15_isr(struct interrupt_frame* frame) {
+	if (pic_read(PIC_ISR) & 0x8000) pic_eoi(PIC_LPT1);
+	pic_eoi(PIC_CASCADE);
+}
+
 EXTERN_C_END
