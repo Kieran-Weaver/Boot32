@@ -59,10 +59,10 @@ hda.img: root/kernel.elf stage2.bin boot.bin
 	dd if=stage2.bin of=hda.img bs=512 seek=1 conv=notrunc
 
 run: hda.img
-	qemu-system-i386 -hda hda.img
+	qemu-system-i386 -cpu pentium2 -accel kvm -hda hda.img
 
 dbg: hda.img
-	qemu-system-i386 -s -S -hda hda.img > /dev/null 2>&1 &
+	qemu-system-i386 -cpu pentium2 -s -S -hda hda.img > /dev/null 2>&1 &
 	gdb root/kernel.elf
 
 clean:

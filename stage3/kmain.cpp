@@ -11,6 +11,7 @@
 #include <x86/pic.h>
 #include <x86/intrinsics.h>
 #include <x86/isrs.h>
+#include <x86/cpuid.h>
 
 void printscreen(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
@@ -56,6 +57,8 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	char str[] = " 0x00000000 | 0x0009FC00 | 1\r\n";
 	char freestr[] = "Free pages: 0x00000000\r\n";
 	char errorstr[] = "Error: invalid page 0x00000000\r\n";
+	char cpuidstr[] = "CPUID Features: \r\n";
+	char cpuidftr[] = "FEAT\r\n";
 	
 	GDT_init(&tss);
 	
@@ -76,6 +79,8 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	sti();
 
 	ser_subsystem_init();
+
+	cpuid_init();
 
 	if (!ser_init(COM1, SERIAL_COM1, B115200)) {
 		printscreen(sErr, screen, strlen((const char*)sErr));
@@ -131,5 +136,15 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	hextostr(free_pages, freestr + 14);
 	kprint(freestr, strlen(freestr));
 	
+	kprint(cpuidstr, strlen(cpuidstr));
+
+	uint32_t cpu_id = cpuid();
+	for (int i = CPUID_FPU; i < 32; i++) {
+		if (cpu_id & (1 << i)) {
+			memcpy(cpuidftr, cpuid_str(i), 4);
+			kprint(cpuidftr, 6);
+		}
+	}
+
 	assert(0);
 }

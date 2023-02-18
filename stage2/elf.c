@@ -68,7 +68,7 @@ void* elf_load_file(const char* filename, void* buf, int bufsiz) {
 		if (shdr->sh_type == SHT_NOBITS) {
 			if (!shdr->sh_size) continue;
 			if (shdr->sh_flags & SHF_ALLOC) {
-				for (bytesread = 0; bytesread < shdr->sh_size; bytesread += 0x1000) {
+				for (bytesread = 0; bytesread <= shdr->sh_size; bytesread += 0x1000) {
 					pt_map(shdr->sh_addr + bytesread);
 				}
 			}
@@ -86,7 +86,7 @@ void* elf_load_file(const char* filename, void* buf, int bufsiz) {
 		
 		if (phdr->p_type == PT_LOAD) {
 			pf_lseek(phdr->p_offset);
-			for (bytesread = 0; bytesread < phdr->p_filesz; bytesread += 0x1000) {
+			for (bytesread = 0; bytesread <= phdr->p_filesz; bytesread += 0x1000) {
 				pt_map(phdr->p_vaddr + bytesread);
 			}
 			pf_read((void*)(phdr->p_vaddr), phdr->p_filesz, &bytesread);
