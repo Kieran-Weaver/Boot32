@@ -89,6 +89,31 @@ static inline void invlpg(void* m)
 	asm volatile ( "invlpg (%0)" : : "b"(m) : "memory" );
 }
 
+static inline uint32_t get_cpuid(void) {
+	uint32_t a, d;
+	asm volatile ("cpuid" : "=a"(a), "=d"(d) : "0"(1) : "ebx", "ecx" );
+	return d;
+}
+
+static inline uint64_t rdmsr(uint32_t msr_id)
+{
+    uint64_t msr_value;
+    asm volatile ( "rdmsr" : "=A" (msr_value) : "c" (msr_id) );
+    return msr_value;
+}
+
+static inline void wrmsr(uint32_t msr_id, uint64_t msr_value)
+{
+    asm volatile ( "wrmsr" : : "c" (msr_id), "A" (msr_value) );
+}
+
+static inline uint64_t rdtsc()
+{
+    uint64_t ret;
+    asm volatile ( "rdtsc" : "=A"(ret) );
+    return ret;
+}
+
 static inline void io_wait(void)
 {
 	outb(0x80, 0);

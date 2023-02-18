@@ -1,7 +1,7 @@
 #include <crt/header.h>
 #include <crt/atomic.h>
 #include <x86/cpuid.h>
-#include <cpuid.h>
+#include <x86/intrinsics.h>
 
 #define CPUID_FEATURES 1
 
@@ -11,9 +11,7 @@ static uint32_t _cpuid;
 static const char cpuid_flags[] = "FPU VME DE  PSE TSC MSR PAE MCE CX8 APICRD1 SEP MTRRPGE MCA CMOVPAT PSE PSN CLFHRD2 DS  ACPIMMX FXSRSSE SSE2SS  HTT TM  IA64PBE ";
 
 void cpuid_init(void) {
-	uint32_t eax, ebx, ecx, edx;
-	__cpuid(CPUID_FEATURES, eax, ebx, ecx, edx);
-	_cpuid = edx;
+	_cpuid = get_cpuid();
 }
 
 uint32_t cpuid(void) {
