@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <mem/ringbuf.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 extern struct serial* COM1;
 extern struct serial* COM2;
@@ -73,8 +72,6 @@ char ser_read(const struct serial* port);
 /* Internals */
 void ser_flush(struct serial* port);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

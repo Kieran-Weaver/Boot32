@@ -1,11 +1,10 @@
 #include <x86/serial.h>
 #include <x86/intrinsics.h>
 #include <crt/print.h>
+#include <crt/header.h>
 #include <stdarg.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 static const char assert_fmt[] = "Assertion failed: %s, (%s: %s: %u)";
 static char tmp_buf[16];
@@ -45,6 +44,4 @@ void __assert_fail (const char * x, const char * file, int line, const char * fu
 	panic(assert_fmt, x, file, func, line);
 }
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END

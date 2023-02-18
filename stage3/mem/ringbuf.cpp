@@ -1,8 +1,7 @@
 #include <mem/ringbuf.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 #define MAX_ELEM 0x7FFF
 #define GRAB_HEAD_TAIL(hdr, size) \
@@ -49,7 +48,4 @@ void buf_read_commit(bufhdr_t* hdr, uint32_t num) {
 	atomic_fetch_add_explicit(hdr, num * 0x10000, memory_order_release);
 }
 
-#ifdef __cplusplus
-}
-#endif
-
+EXTERN_C_END

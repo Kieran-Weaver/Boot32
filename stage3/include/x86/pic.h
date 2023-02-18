@@ -2,6 +2,7 @@
 #define PIC_H
 
 #include <stdint.h>
+#include <crt/header.h>
 
 #define PIC_IRR 0x0A
 #define PIC_ISR 0x0B
@@ -23,9 +24,7 @@
 #define PIC_ATA1  14
 #define PIC_ATA2  15
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 void pic_init(int offset);
 void pic_disable(void);
@@ -36,8 +35,6 @@ uint16_t pic_read(int reg);
 void pic_irqmask1(uint8_t mask);
 void pic_irqmask2(uint8_t mask);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

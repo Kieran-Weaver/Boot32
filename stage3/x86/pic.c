@@ -1,5 +1,6 @@
 #include <x86/intrinsics.h>
 #include <x86/pic.h>
+#include <crt/header.h>
 
 #define PIC1_CMD	0x20
 #define PIC1_DATA	0x21
@@ -10,9 +11,7 @@
 #define ICW4_8086	0x01
 #define PIC_EOI		0x20
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 void pic_init(int offset) {
 	/* ICW1: start init */
@@ -66,6 +65,4 @@ void pic_eoi(int irq) {
 	outb(PIC1_CMD,PIC_EOI);
 }
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END

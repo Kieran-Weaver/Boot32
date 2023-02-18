@@ -2,10 +2,9 @@
 #define GDT_H
 
 #include <stdint.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 #define GDT_CS0 0x08
 #define GDT_DS0 0x10
@@ -60,8 +59,6 @@ void loadGDT(const struct DTR* gdtr, uint16_t cs, uint16_t ds);
 void IDT_init(void);
 void IDT_setIRQ(uint8_t vector, const void* irq_addr, uint8_t flags);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

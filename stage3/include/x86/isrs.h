@@ -2,16 +2,13 @@
 #define ISRS_H
 
 #include <x86/gdt.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 __attribute__((interrupt)) void timer_isr(struct interrupt_frame* frame);
 __attribute__((interrupt)) void com1_isr(struct interrupt_frame* frame);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

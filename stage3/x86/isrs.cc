@@ -1,10 +1,9 @@
 #include <x86/gdt.h>
 #include <x86/serial.h>
 #include <x86/pic.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 __attribute__((interrupt)) void timer_isr(struct interrupt_frame* frame) {
 	const char msg[] = "PIT interrupt received\r\n";
@@ -19,6 +18,4 @@ __attribute__((interrupt)) void com1_isr(struct interrupt_frame* frame) {
 	pic_eoi(PIC_COM1);
 }
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END

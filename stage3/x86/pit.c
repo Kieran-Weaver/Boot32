@@ -1,5 +1,6 @@
 #include <x86/pit.h>
 #include <x86/intrinsics.h>
+#include <crt/header.h>
 
 #define PIT_DATA 0x40
 #define PIT_CMD  0x43
@@ -7,9 +8,7 @@
 #define PIT_LATCH 0
 #define PIT_HILO  0x30
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 void pit_arm( int mode, uint16_t period ) {
 	uint32_t eflags = save_intr();
@@ -34,6 +33,4 @@ uint16_t pit_read( void ) {
 	return ret;
 }
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END

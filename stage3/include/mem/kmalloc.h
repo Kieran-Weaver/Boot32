@@ -2,11 +2,10 @@
 #define KMALLOC_H
 
 #include <mem/vaddr.h>
+#include <crt/header.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 // Initialize valloc and vfree
 void    vinit(void);
@@ -26,7 +25,8 @@ inline void *operator new(size_t, void *p)     throw() { return p; }
 inline void *operator new[](size_t, void *p)   throw() { return p; }
 inline void  operator delete  (void *, void *) noexcept { };
 inline void  operator delete[](void *, void *) noexcept { };
-}
 #endif
+
+EXTERN_C_END
 
 #endif

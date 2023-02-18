@@ -5,10 +5,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <mem/vaddr.h>
+#include <crt/header.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+EXTERN_C_BEGIN
 
 #define SLAB_SENTINEL 0xFFFFFFFF
 #define SLABP_SIZE ((PAGE_SIZE / sizeof(uint32_t)) - 2)
@@ -25,9 +24,6 @@ bool  slabp_full(const struct slab_page* slb);
 void* slabp_alloc(struct slab_page* slb);
 void  slabp_free(struct slab_page* slb, void* data);
 
-#ifdef __cplusplus
-}
-
-#endif
+EXTERN_C_END
 
 #endif

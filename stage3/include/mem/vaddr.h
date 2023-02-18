@@ -1,11 +1,11 @@
 #ifndef VADDR_H
 #define VADDR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
+#include <crt/header.h>
+
+EXTERN_C_BEGIN
+
 #define PAGE_SIZE 4096
 
 typedef uint32_t* vaddr_t;
@@ -49,8 +49,6 @@ uint32_t pt_unmap(vaddr_t vaddr);
 // Replace virtual page's flags with new flags
 void     vmark(vaddr_t vaddr, uint32_t flags);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif

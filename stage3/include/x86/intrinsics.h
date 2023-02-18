@@ -1,11 +1,10 @@
 #ifndef INTRINSICS_H
 #define INTRINSICS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
+#include <crt/header.h>
+
+EXTERN_C_BEGIN
 
 #define EFLAGS_CF  (1 << 0)
 #define EFLAGS_PF  (1 << 2)
@@ -181,8 +180,6 @@ static inline uint32_t ctz(uint32_t x)
 
 void loadPageDirectory(uint32_t*);
 
-#ifdef __cplusplus
-}
-#endif
+EXTERN_C_END
 
 #endif
