@@ -12,6 +12,7 @@
 #include <x86/intrinsics.h>
 #include <x86/isrs.h>
 #include <x86/cpuid.h>
+#include <x86/mtrr.h>
 
 void printscreen(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
@@ -81,6 +82,7 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	ser_subsystem_init();
 
 	cpuid_init();
+	mtrr_init();
 
 	if (!ser_init(COM1, SERIAL_COM1, B115200)) {
 		printscreen(sErr, screen, strlen((const char*)sErr));
