@@ -13,6 +13,7 @@
 #include <x86/isrs.h>
 #include <x86/cpuid.h>
 #include <x86/mtrr.h>
+#include <x86/acpi.h>
 
 void printscreen(const uint8_t* in, volatile uint8_t* screen, uint16_t n){
 	for (uint16_t i = 0; i < n; i++){
@@ -48,6 +49,7 @@ void clear(volatile uint8_t* screen) {
 
 static volatile vaddr_t vaddrs[8192];
 static struct TSS tss;
+static struct acpi_fixed acpi;
 
 extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 	volatile uint8_t* screen = (uint8_t*)0xB8000;
@@ -147,6 +149,8 @@ extern "C" void kmain(SMAP32_t* e820, size_t e820_size) {
 			kprint(cpuidftr, 6);
 		}
 	}
+
+	acpi_init_fixed( &acpi );
 
 	assert(0);
 }

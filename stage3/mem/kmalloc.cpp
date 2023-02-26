@@ -3,6 +3,7 @@
 #include <crt/sort.h>
 #include <mem/pmm.h>
 #include <crt/assert.h>
+#include <crt/util.h>
 
 const static uint32_t* kpd  = reinterpret_cast<uint32_t*>(0xFFFFFC00);
 
@@ -137,6 +138,41 @@ void vfree(vaddr_t vaddr) {
 			ptmeta[idx++] = tmp;
 		} else break;
 	}
+}
+
+// Map data block
+vaddr_t vmap(paddr_t paddr, size_t size) {
+	/* Workaround because there's no way to valloc multiple contiguous pages */
+	vaddr_t tmp, mapped;
+
+	assert(size <= PAGE_SIZE);
+
+	tmp = valloc();
+	mapped = valloc();
+
+	uint32_t offset = paddr & PT_FLAGS_MASK;
+
+	paddr_t oldpage = pt_map(paddr & PT_PAGE_MASK, tmp, PRESENT | RAM_PRESENT);
+
+	if ((offset + size) <= PAGE_SIZE) {
+		memcpy(mapped, tmp + offset, size);
+	} else {
+		memcpy(mapped, tmp + offset, PAGE_SIZE - offset);
+		pt_map((paddr & PT_PAGE_MASK) + PAGE_SIZE, tmp, PRESENT | RAM_PRESENT);
+		memcpy(mapped + (PAGE_SIZE - offset), tmp, (offset + size) - PAGE_SIZE);
+	}
+
+	pt_map(oldpage & PT_PAGE_MASK, tmp, oldpage & PT_FLAGS_MASK);
+
+	vfree(tmp);
+
+	return mapped;
+}
+
+// Unmap data block
+void    vunmap(vaddr_t vaddr, size_t size) {
+	assert(size <= PAGE_SIZE);
+	pmm_free_ppage(pt_unmap(vaddr));
 }
 
 // Allocate block

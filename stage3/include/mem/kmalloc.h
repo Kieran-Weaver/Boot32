@@ -13,6 +13,10 @@ void    vinit(void);
 vaddr_t valloc(void);
 // Free virtual page
 void    vfree(vaddr_t vaddr);
+// Map data block
+vaddr_t vmap(paddr_t paddr, size_t size);
+// Unmap data block
+vaddr_t vunmap(paddr_t paddr, size_t size);
 // Allocate block
 void*   kmalloc(size_t size);
 // Deallocate block

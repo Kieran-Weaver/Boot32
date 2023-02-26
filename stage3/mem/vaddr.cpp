@@ -2,7 +2,7 @@
 #include <mem/pagetable.h>
 #include <x86/intrinsics.h>
 
-const static uint32_t* pd  = reinterpret_cast<uint32_t*>(0xFFFFF000);
+static uint32_t* const pd  = reinterpret_cast<uint32_t*>(0xFFFFF000);
 
 paddr_t get_paddr(vaddr_t vaddr) {
 	uint32_t  pdi = (reinterpret_cast<uint32_t>(vaddr) >> 22);
